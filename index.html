@@ -11,8 +11,15 @@
 	<input id="pac-input" class="controls" type="text" placeholder="Starting Point">
 	<div id="map"></div>
 	<div id="legend" class="controls">
-		<ul data-bind="foreach: listView">
-			<li data-bind="text: $data.name">
+			<div class="checkbox">
+				<label><input type="checkbox" name="whatToDo" value="culture">Culture</label><br>
+				<label><input type="checkbox" name="whatToDo" value="amusement">Amusement</label>
+				<label><input type="checkbox" name="whatToDo" value="outdoors">Outdoor Pursuits</label>
+				<label><input type="checkbox" name="whatToDo" value="animals">Animals</label>
+				<button type="button" class="btn btn-default" onclick="view.seePlaces()">Get Places to See!</button>
+			</div>
+		<ul class="list-group" data-bind="foreach: listView">
+			<li class="list-group-item" data-bind="text: $data.name">
 			</li>
 		</ul>
 	</div>

@@ -62,6 +62,11 @@ function addSearch (){
 });
 }
 
+var outdoors = ['park', 'zoo'];
+var culture = ['art_gallery', 'library', 'museum'];
+var amusement = ['amusement_park', 'bowling_alley', 'museum', 'stadium'];
+var animals = ['aquarium', 'zoo'];
+
 var Place = function(name, position, icon){
 	this.map = map;
 	this.name = ko.observable(name);
@@ -82,6 +87,12 @@ var ViewModel = function(){
 
 	self.addPlace = function (name, position, icon){
 		self.listView.push(new Place(name, position, icon));
+	};
+
+	self.seePlaces = function (){
+		$('input[name="whatToDo"]:checked').each(function(){
+			console.log(this.value);
+		});
 	};
 
 };
