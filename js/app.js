@@ -7,6 +7,7 @@ var listView;
 var view;
 var markers = [];
 
+//Add google maps to screen with search box
 function initMap(){
 	map = new google.maps.Map(document.getElementById('map'),{
 		center: startPoint,
@@ -20,6 +21,7 @@ function initMap(){
 		document.getElementById('legend'));
 }
 
+//Search box, used to find starting point for plan
 function addSearch (){
 	// Create the search box and link it to the UI element.
 	var input = document.getElementById('pac-input');
@@ -42,7 +44,7 @@ function addSearch (){
 		places.forEach(function(place) {
 			var name = place.name;
 			var position = place.geometry.location;
-			var icon = view.icon(places);
+			var icon = view.icon(markers);
 
 			view.addPlace(name, position, icon);
 
@@ -58,6 +60,7 @@ function addSearch (){
 });
 }
 
+//Search google places by type
 function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
@@ -86,6 +89,7 @@ function findThings (what){
 	}
 }
 
+//Holds the google map search results
 var Place = function(name, position, icon){
 	this.map = map;
 	this.name = ko.observable(name);
@@ -104,10 +108,12 @@ var ViewModel = function(){
 
 	self.listView = ko.observableArray([]);
 
+	//Add a place to an observable array
 	self.addPlace = function (name, position, icon){
 		self.listView.push(new Place(name, position, icon));
 	};
 
+	//Defines types for the findThings function to search
 	self.seePlaces = function (){
 		var forSearch = [];
 
@@ -133,23 +139,17 @@ var ViewModel = function(){
 		findThings(forSearch);
 	};
 
+	//Defines the icon to use for each Place
 	self.icon = function (array){
 		var url;
 		var icon;
-		if(array.length === 1){
-			url = 'http://maps.gstatic.com/mapfiles/markers2/markerA.png';
-		}else if(array.length === 1){
-			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'B'+'.png';
-		}else if(array.length === 2){
-			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'C'+'.png';
-		}else if(array.length === 3){
-			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'D'+'.png';
-		}else if(array.length === 4){
-			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'E'+'.png';
-		}else{
-			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'F'+'.png';
+		var alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
+
+		for(var i = 0; i<alpha.length; i++){
+			if(array.length === i){
+				url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+alpha[i]+'.png';
+			}
 		}
-		//return url;
 		icon = {
 				url: url,
 				origin: new google.maps.Point(0, 0),
