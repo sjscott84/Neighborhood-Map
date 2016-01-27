@@ -42,14 +42,9 @@ function addSearch (){
 		places.forEach(function(place) {
 			var name = place.name;
 			var position = place.geometry.location;
-			var icon = {
-				url: 'http://maps.gstatic.com/mapfiles/markers2/markerA.png',
-				origin: new google.maps.Point(0, 0),
-				anchor: new google.maps.Point(17, 34),
-			};
+			var icon = view.icon(places);
 
 			view.addPlace(name, position, icon);
-
 
 			if (place.geometry.viewport) {
 			// Only geocodes have viewport.
@@ -61,41 +56,35 @@ function addSearch (){
 		map.fitBounds(bounds);
 	});
 });
-	findThings();
 }
 
-function findThings (){
+function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
 	service.nearbySearch({
 		location: startPoint,
-		radius: '5000',
-		type: ['museum']
+		radius: '10000',
+		types: what
 		}, callback);
 
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
+				if(results[i].rating > 4){
+					console.log(results[i]);
 					var place = results[i];
 					var name = place.name;
+					//var googleRate = place.rating;
 					var position = place.geometry.location;
-					var icon = {
-						url: 'http://maps.gstatic.com/mapfiles/markers2/markerA.png',
-						origin: new google.maps.Point(0, 0),
-						anchor: new google.maps.Point(17, 34),
-					};
+					var icon = view.icon(markers);
 
 					view.addPlace(name, position, icon);
 					//createMarker(results[i]);)
+				}
 			}
 		}
 	}
 }
-
-var outdoors = ['park', 'zoo'];
-var culture = ['art_gallery', 'library', 'museum'];
-var amusement = ['amusement_park', 'bowling_alley', 'museum', 'stadium'];
-var animals = ['aquarium', 'zoo'];
 
 var Place = function(name, position, icon){
 	this.map = map;
@@ -121,15 +110,53 @@ var ViewModel = function(){
 
 	self.seePlaces = function (){
 		var forSearch = [];
+
 		$('input[name="whatToDo"]:checked').each(function(){
 			var input = this.value;
-			forSearch.push(input);
+			switch (input) {
+				case 'outdoors':
+					input = ['park', 'zoo'];
+					break;
+				case 'culture':
+					input = ['art_gallery', 'library', 'museum'];
+					break;
+				case 'amusement':
+					input = ['amusement_park', 'bowling_alley', 'museum', 'stadium'];
+					break;
+				case 'animals':
+					input = ['aquarium', 'zoo'];
+					break;
+			}
+				forSearch = forSearch.concat(input);
 		});
-			console.log(forSearch);
+		console.log(forSearch);
+		findThings(forSearch);
 	};
 
-
-
+	self.icon = function (array){
+		var url;
+		var icon;
+		if(array.length === 1){
+			url = 'http://maps.gstatic.com/mapfiles/markers2/markerA.png';
+		}else if(array.length === 1){
+			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'B'+'.png';
+		}else if(array.length === 2){
+			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'C'+'.png';
+		}else if(array.length === 3){
+			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'D'+'.png';
+		}else if(array.length === 4){
+			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'E'+'.png';
+		}else{
+			url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+'F'+'.png';
+		}
+		//return url;
+		icon = {
+				url: url,
+				origin: new google.maps.Point(0, 0),
+				anchor: new google.maps.Point(17, 34),
+				};
+		return icon;
+	}
 };
 
 view = new ViewModel();
