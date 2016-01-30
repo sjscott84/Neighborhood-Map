@@ -6,6 +6,8 @@ var places;
 var listView;
 var view;
 var markers = [];
+var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var labelIndex = 0;
 
 //Add google maps to screen with search box
 function initMap(){
@@ -55,7 +57,7 @@ function addSearch (){
 				bounds.extend(place.geometry.location);
 			}
 
-		map.fitBounds(bounds);
+		//map.fitBounds(bounds);
 	});
 });
 }
@@ -65,15 +67,16 @@ function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
 	service.nearbySearch({
-		location: startPoint,
-		radius: '10000',
-		types: what
+		location: markers[0].position,
+		//radius: '500',
+		types: what,
+		rankBy: google.maps.places.RankBy.DISTANCE
 		}, callback);
 
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
-				if(results[i].rating > 4){
+				//if(results[i].rating > 4){
 					console.log(results[i]);
 					var place = results[i];
 					var name = place.name;
@@ -83,7 +86,7 @@ function findThings (what){
 
 					view.addPlace(name, position, icon);
 					//createMarker(results[i]);)
-				}
+				//}
 			}
 		}
 	}
@@ -97,14 +100,15 @@ var Place = function(name, position, icon){
 	this.icon = icon;
 	markers.push(new google.maps.Marker({
 			map: map,
-			icon: icon,
 			title: name,
-			position: this.position
+			position: this.position,
+			label: labels[labelIndex++ % labels.length],
 		}));
 };
 
 var ViewModel = function(){
 	var self = this;
+	var markerCounter = 0;
 
 	self.listView = ko.observableArray([]);
 
@@ -112,6 +116,8 @@ var ViewModel = function(){
 	self.addPlace = function (name, position, icon){
 		self.listView.push(new Place(name, position, icon));
 	};
+
+	//this.currentPlace = ko.observable(this.listView()[0]);
 
 	//Defines types for the findThings function to search
 	self.seePlaces = function (){
@@ -139,24 +145,11 @@ var ViewModel = function(){
 		findThings(forSearch);
 	};
 
-	//Defines the icon to use for each Place
-	self.icon = function (array){
-		var url;
-		var icon;
-		var alpha = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'];
-
-		for(var i = 0; i<alpha.length; i++){
-			if(array.length === i){
-				url = 'http://maps.gstatic.com/mapfiles/markers2/marker'+alpha[i]+'.png';
-			}
-		}
-		icon = {
-				url: url,
-				origin: new google.maps.Point(0, 0),
-				anchor: new google.maps.Point(17, 34),
-				};
-		return icon;
-	}
+	//this.setPlace = function(clickedPlace){
+		//self.currentPlace(clickedPlace);
+		//self.currentPlace.style.backgroundColor = "red";
+		//console.log(self.currentPlace.name);
+	//}
 };
 
 view = new ViewModel();
