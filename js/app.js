@@ -8,6 +8,8 @@ var view;
 var markers = [];
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var labelIndex = 0;
+var infowindow;
+
 
 //Add google maps to screen with search box
 function initMap(){
@@ -46,9 +48,9 @@ function addSearch (){
 		places.forEach(function(place) {
 			var name = place.name;
 			var position = place.geometry.location;
-			var icon = view.icon(markers);
+			//var icon = view.icon(markers);
 
-			view.addPlace(name, position, icon);
+			view.addPlace(name, position);
 
 			if (place.geometry.viewport) {
 			// Only geocodes have viewport.
@@ -82,9 +84,9 @@ function findThings (what){
 					var name = place.name;
 					//var googleRate = place.rating;
 					var position = place.geometry.location;
-					var icon = view.icon(markers);
+					//var icon = view.icon(markers);
 
-					view.addPlace(name, position, icon);
+					view.addPlace(name, position);
 					//createMarker(results[i]);)
 				//}
 			}
@@ -92,18 +94,30 @@ function findThings (what){
 	}
 }
 
+function showInfo (where, marker){
+	infowindow = new google.maps.InfoWindow();
+	map = map;
+	var contentString = where;
+	infowindow.close();
+	infowindow.setContent(contentString);
+	infowindow.open(map, marker);
+
+}
+
 //Holds the google map search results
-var Place = function(name, position, icon){
+var Place = function(name, position){
 	this.map = map;
-	this.name = ko.observable(name);
+	this.name = name;
 	this.position = position;
-	this.icon = icon;
-	markers.push(new google.maps.Marker({
+	//this.icon = icon;
+	this.marker = new google.maps.Marker({
 			map: map,
 			title: name,
 			position: this.position,
 			label: labels[labelIndex++ % labels.length],
-		}));
+		});
+
+	markers.push(this.marker);
 };
 
 var ViewModel = function(){
@@ -113,11 +127,11 @@ var ViewModel = function(){
 	self.listView = ko.observableArray([]);
 
 	//Add a place to an observable array
-	self.addPlace = function (name, position, icon){
-		self.listView.push(new Place(name, position, icon));
+	self.addPlace = function (name, position){
+		self.listView.push(new Place(name, position));
 	};
 
-	//this.currentPlace = ko.observable(this.listView()[0]);
+	self.currentPlace = ko.observable();
 
 	//Defines types for the findThings function to search
 	self.seePlaces = function (){
@@ -145,11 +159,11 @@ var ViewModel = function(){
 		findThings(forSearch);
 	};
 
-	//this.setPlace = function(clickedPlace){
-		//self.currentPlace(clickedPlace);
-		//self.currentPlace.style.backgroundColor = "red";
+	self.setPlace = function(clickedPlace){
+		self.currentPlace(clickedPlace);
+		showInfo(self.currentPlace().name, self.currentPlace().marker);
 		//console.log(self.currentPlace.name);
-	//}
+	}
 };
 
 view = new ViewModel();
