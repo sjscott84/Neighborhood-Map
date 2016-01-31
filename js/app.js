@@ -3,7 +3,6 @@ var map;
 var startPoint = {lat:37.773972, lng: -122.431297};
 var searchBox;
 var places;
-var listView;
 var view;
 var markers = [];
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -18,6 +17,8 @@ function initMap(){
 		zoom: 12,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
+
+	infowindow = new google.maps.InfoWindow;
 
 	addSearch();
 
@@ -48,7 +49,6 @@ function addSearch (){
 		places.forEach(function(place) {
 			var name = place.name;
 			var position = place.geometry.location;
-			//var icon = view.icon(markers);
 
 			view.addPlace(name, position);
 
@@ -95,13 +95,17 @@ function findThings (what){
 }
 
 function showInfo (where, marker){
-	infowindow = new google.maps.InfoWindow();
-	map = map;
 	var contentString = where;
-	infowindow.close();
-	infowindow.setContent(contentString);
-	infowindow.open(map, marker);
+	map = map;
+	//infowindow = new google.maps.InfoWindow;
 
+	infowindow.close();
+
+	infowindow = new google.maps.InfoWindow({
+		content: contentString
+	});
+
+	infowindow.open(map, marker);
 }
 
 //Holds the google map search results
@@ -122,7 +126,6 @@ var Place = function(name, position){
 
 var ViewModel = function(){
 	var self = this;
-	var markerCounter = 0;
 
 	self.listView = ko.observableArray([]);
 
@@ -164,6 +167,8 @@ var ViewModel = function(){
 		showInfo(self.currentPlace().name, self.currentPlace().marker);
 		//console.log(self.currentPlace.name);
 	}
+
+
 };
 
 view = new ViewModel();
