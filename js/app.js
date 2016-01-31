@@ -8,6 +8,8 @@ var markers = [];
 var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var labelIndex = 0;
 var infowindow;
+var directionsDisplay;
+var directionsService;
 
 
 //Add google maps to screen with search box
@@ -19,6 +21,8 @@ function initMap(){
 	});
 
 	infowindow = new google.maps.InfoWindow;
+	directionsDisplay = new google.maps.DirectionsRenderer();
+	directionsService = new google.maps.DirectionsService();
 
 	addSearch();
 
@@ -110,10 +114,10 @@ function showInfo (where, marker){
 
 function getDirections (where){
 	map = map;
-	var directionsDisplay = new google.maps.DirectionsRenderer();
-	var directionsService = new google.maps.DirectionsService();
 
 	directionsDisplay.setMap(map);
+	directionsDisplay.setOptions( { suppressMarkers: true } );
+	directionsDisplay.setPanel(document.getElementById("directionsPanel"));
 
 	var start = view.listView()[0].position;
 	var end = where;
