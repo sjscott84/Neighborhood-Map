@@ -108,6 +108,28 @@ function showInfo (where, marker){
 	infowindow.open(map, marker);
 }
 
+function getDirections (where){
+	map = map;
+	var directionsDisplay = new google.maps.DirectionsRenderer();
+	var directionsService = new google.maps.DirectionsService();
+
+	directionsDisplay.setMap(map);
+
+	var start = view.listView()[0].position;
+	var end = where;
+	var request = {
+		origin:start,
+		destination:end,
+		travelMode: google.maps.TravelMode.WALKING
+	};
+
+	directionsService.route(request, function(result, status) {
+		if (status == google.maps.DirectionsStatus.OK) {
+			directionsDisplay.setDirections(result);
+		}
+	});
+}
+
 //Holds the google map search results
 var Place = function(name, position){
 	this.map = map;
@@ -166,6 +188,7 @@ var ViewModel = function(){
 		self.currentPlace(clickedPlace);
 		showInfo(self.currentPlace().name, self.currentPlace().marker);
 		//console.log(self.currentPlace.name);
+		getDirections(self.currentPlace().position);
 	}
 
 
