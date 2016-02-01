@@ -14,8 +14,6 @@ var directionsService;
 
 //Add google maps to screen with search box
 function initMap(){
-	var initialLocation;
-	var browserSupportFlag =  new Boolean();
 
 	map = new google.maps.Map(document.getElementById('map'),{
 		center: startPoint,
@@ -24,39 +22,13 @@ function initMap(){
 	});
 
 	infowindow = new google.maps.InfoWindow;
-	directionsDisplay = new google.maps.DirectionsRenderer();
-	directionsService = new google.maps.DirectionsService();
+
+	findLocation();
 
 	addSearch();
 
 	map.controls[google.maps.ControlPosition.LEFT_TOP].push(
 		document.getElementById('legend'));
-
-	// Try W3C Geolocation (Preferred)
-	if(navigator.geolocation) {
-		browserSupportFlag = true;
-		navigator.geolocation.getCurrentPosition(function(position) {
-		initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-		map.setCenter(initialLocation);
-	}, function() {
-		handleNoGeolocation(browserSupportFlag);
-	});
-	}
-	// Browser doesn't support Geolocation
-	else {
-		browserSupportFlag = false;
-		handleNoGeolocation(browserSupportFlag);
-	}
-
-	function handleNoGeolocation(errorFlag) {
-		if (errorFlag == true) {
-			alert("Geolocation service failed.");
-			map.setCenter(startPoint);
-		} else {
-			alert("Your browser doesn't support geolocation.");
-			map.setCenter(startPoint);
-		}
-	}
 }
 
 //Search box, used to find starting point for plan
@@ -95,6 +67,43 @@ function addSearch (){
 		//map.fitBounds(bounds);
 	});
 });
+}
+
+function findLocation (){
+	map = map;
+	var browserSupportFlag =  new Boolean();
+	var initialLocation;
+	var pos;
+
+	directionsDisplay = new google.maps.DirectionsRenderer();
+	directionsService = new google.maps.DirectionsService();
+
+	// Try W3C Geolocation (Preferred)
+	if(navigator.geolocation) {
+		browserSupportFlag = true;
+		navigator.geolocation.getCurrentPosition(function(position) {
+			initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+			map.setCenter(initialLocation);
+			view.addPlace("Starting Point", initialLocation);
+		}, function() {
+			handleNoGeolocation(browserSupportFlag);
+		});
+	}
+	// Browser doesn't support Geolocation
+	else {
+		browserSupportFlag = false;
+		handleNoGeolocation(browserSupportFlag);
+	}
+
+	function handleNoGeolocation(errorFlag) {
+		if (errorFlag == true) {
+			alert("Geolocation service failed, enter your starting location in the search field in the map");
+			map.setCenter(startPoint);
+		} else {
+			alert("Geolocation service failed, enter your starting location in the search field in the map");
+			map.setCenter(startPoint);
+		}
+	}
 }
 
 //Search google places by type
