@@ -224,9 +224,9 @@ var ViewModel = function(){
 			}
 				forSearch = forSearch.concat(input);
 		});
-		console.log(forSearch);
+		//console.log(forSearch);
 		findThings(forSearch);
-		yelpHell();
+		yelpHell(forSearch);
 	};
 
 	self.setPlace = function(clickedPlace){

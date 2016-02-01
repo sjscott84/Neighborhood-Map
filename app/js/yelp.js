@@ -1,75 +1,17 @@
-function getYelp(){
 
-var auth = {
-    consumerKey : "eOiRip_OTWAQMok1jVmN0w",
-    consumerSecret : "XNTpfWaUXwNH_iHF4DrH923nzts",
-    accessToken : "IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA",
-    accessTokenSecret : "paG-lPKZ9fQxhJz6ZEh42nBttiA",
-    serviceProvider : {
-        signatureMethod : "HMAC-SHA1"
-    }
-};
-
-var terms = 'food';
-var near = 'San+Francisco';
-
-var accessor = {
-    consumerSecret : auth.consumerSecret,
-    tokenSecret : auth.accessTokenSecret
-};
-parameters = [];
-parameters.push(['term', terms]);
-parameters.push(['location', near]);
-parameters.push(['callback', 'cb']);
-parameters.push(['oauth_consumer_key', auth.consumerKey]);
-parameters.push(['oauth_consumer_secret', auth.consumerSecret]);
-parameters.push(['oauth_token', auth.accessToken]);
-parameters.push(['oauth_signature_method', 'HMAC-SHA1']);
-
-var message = {
-    'action' : 'http://api.yelp.com/v2/search',
-    'method' : 'GET',
-    'parameters' : parameters
-};
-
-OAuth.setTimestampAndNonce(message);
-OAuth.SignatureMethod.sign(message, accessor);
-
-var parameterMap = OAuth.getParameterMap(message.parameters);
-console.log(parameterMap);
-
-$.ajax({
-    'url' : message.action,
-    'data' : parameterMap,
-    'cache' : true, 
-    'dataType' : 'jsonp',
-    'jsonpCallback' : 'cb',
-    'success' : function(data, textStats, XMLHttpRequest) {
-        console.log(data);
-            //if(data) {
-                //var hits = data.businesses,
-                    //item_str = '<li>%name%</li>';
-                //hits.forEach(function(result) { $('#results').append(item_str.replace('%name%', result.name))
-                //});
-            //}
-    },
-    'error' : function(error) {                                       $('#error').css('opacity', '1');
-    }
-});
-
-};
-
-function yelpHell (){
+function yelpHell (what){
 
 function nonce_generate() {
   return (Math.floor(Math.random() * 1e12).toString());
 }
 
 var yelp_url = 'https://api.yelp.com/v2/search?';
+var terms = what.join(', ');
+console.log(terms);
 
   var parameters = {
-    term: 'food',
-    location: 'chicago',
+    term: terms,
+    location: 'San Francisco',
     oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
     oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',
     oauth_nonce: nonce_generate(),
