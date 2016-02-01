@@ -11,7 +11,7 @@
 	<input id="pac-input" class="controls" type="text" placeholder="Starting Point">
 	<div id="map"></div>
 	<div id="legend" class="controls">
-			<div class="checkbox">
+			<div data-bind="visible: showOptions" class="checkbox">
 				<label><input type="checkbox" name="whatToDo" value="culture">Culture</label><br>
 				<label><input type="checkbox" name="whatToDo" value="amusement">Amusement</label>
 				<label><input type="checkbox" name="whatToDo" value="outdoors">Outdoor Pursuits</label>
@@ -19,7 +19,7 @@
 				<button type="button" class="btn btn-default" onclick="view.seePlaces()">Get Places to See!</button>
 			</div>
 		<ul class="list-group" data-bind="foreach: listView">
-			<li class="list-group-item" data-bind="text: $data.name, click: $root.setPlace">
+			<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace">
 			</li>
 		</ul>
 
@@ -32,6 +32,10 @@
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZnUzSkNCumO4XVfZ9V26yLh9Y__14C9U&libraries=places&callback=initMap"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/app.js" type="text/javascript"></script>
+	<script src="../node_modules/oauth-signature/dist/oauth-signature.js"></script>
+	<!--<script src="http://oauth.googlecode.com/svn/code/javascript/oauth.js"></script>-->
+	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>  
+	<script src="js/yelp.js" type="text/javascript"></script>
 </body>
 
 </html>

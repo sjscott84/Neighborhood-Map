@@ -120,7 +120,7 @@ function findThings (what){
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
-				//if(results[i].rating > 4){
+				if(results[i].rating > 4){
 					console.log(results[i]);
 					var place = results[i];
 					var name = place.name;
@@ -130,10 +130,11 @@ function findThings (what){
 
 					view.addPlace(name, position);
 					//createMarker(results[i]);)
-				//}
+				}
 			}
 		}
 	}
+	view.showOptions(false);
 }
 
 function showInfo (where, marker){
@@ -186,11 +187,12 @@ var Place = function(name, position){
 		});
 
 	markers.push(this.marker);
+	this.listName = this.marker.label+" - "+name;
 };
 
 var ViewModel = function(){
 	var self = this;
-
+	self.showOptions = ko.observable(true);
 	self.listView = ko.observableArray([]);
 
 	//Add a place to an observable array
@@ -224,6 +226,7 @@ var ViewModel = function(){
 		});
 		console.log(forSearch);
 		findThings(forSearch);
+		yelpHell();
 	};
 
 	self.setPlace = function(clickedPlace){

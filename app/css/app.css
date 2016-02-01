@@ -2,6 +2,7 @@ html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
+	overflow: scroll;
 }
 
 #map {
@@ -65,4 +66,5 @@ html, body {
 	margin-left: 12px;
 	padding-left: 10px;
 	padding-right: 10px;
+	overflow: scroll;
 }
