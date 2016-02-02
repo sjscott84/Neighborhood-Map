@@ -10,6 +10,7 @@ var labelIndex = 0;
 var infowindow;
 var directionsDisplay;
 var directionsService;
+var vicinity;
 
 
 //Add google maps to screen with search box
@@ -54,8 +55,9 @@ function addSearch (){
 		places.forEach(function(place) {
 			var name = place.name;
 			var position = place.geometry.location;
+			vicinity = place.vicinity;
 
-			view.addPlace(name, position);
+			view.addPlace(name, position, vicinity);
 
 			if (place.geometry.viewport) {
 			// Only geocodes have viewport.
@@ -74,6 +76,7 @@ function findLocation (){
 	var browserSupportFlag =  new Boolean();
 	var initialLocation;
 	var pos;
+	var geocoder = new google.maps.Geocoder;
 
 	directionsDisplay = new google.maps.DirectionsRenderer();
 	directionsService = new google.maps.DirectionsService();
@@ -84,7 +87,8 @@ function findLocation (){
 		navigator.geolocation.getCurrentPosition(function(position) {
 			initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
 			map.setCenter(initialLocation);
-			view.addPlace("Starting Point", initialLocation);
+			geocodeLatLng(initialLocation);
+			view.addPlace("Starting Point", initialLocation, vicinity);
 		}, function() {
 			handleNoGeolocation(browserSupportFlag);
 		});
@@ -103,6 +107,22 @@ function findLocation (){
 			alert("Geolocation service failed, enter your starting location in the search field in the map");
 			map.setCenter(startPoint);
 		}
+	}
+
+	function geocodeLatLng(where){
+		var latlng = where;
+		geocoder.geocode({'location': latlng}, function(results, status){
+			if (status === google.maps.GeocoderStatus.OK) {
+				if (results[1]) {
+					vicinity = results[1].address_components[1].long_name;
+					//console.log(vicinity);
+				} else {
+				window.alert('No results found');
+				}
+				} else {
+				window.alert('Geocoder failed due to: ' + status);
+				}
+		})
 	}
 }
 
@@ -174,10 +194,11 @@ function getDirections (where){
 }
 
 //Holds the google map search results
-var Place = function(name, position){
+var Place = function(name, position, vicinity){
 	this.map = map;
 	this.name = name;
 	this.position = position;
+	this.vicinity = vicinity
 	//this.icon = icon;
 	this.marker = new google.maps.Marker({
 			map: map,
@@ -196,8 +217,8 @@ var ViewModel = function(){
 	self.listView = ko.observableArray([]);
 
 	//Add a place to an observable array
-	self.addPlace = function (name, position){
-		self.listView.push(new Place(name, position));
+	self.addPlace = function (name, position, vicinity){
+		self.listView.push(new Place(name, position, vicinity));
 	};
 
 	self.currentPlace = ko.observable();
@@ -226,7 +247,7 @@ var ViewModel = function(){
 		});
 		//console.log(forSearch);
 		findThings(forSearch);
-		yelpHell(forSearch);
+		yelpHell(forSearch, vicinity);
 	};
 
 	self.setPlace = function(clickedPlace){

@@ -1,5 +1,5 @@
 
-function yelpHell (what){
+function yelpHell (what, where){
 
 function nonce_generate() {
   return (Math.floor(Math.random() * 1e12).toString());
@@ -11,7 +11,7 @@ console.log(terms);
 
   var parameters = {
     term: terms,
-    location: 'San Francisco',
+    location: where,
     oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
     oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',
     oauth_nonce: nonce_generate(),
