@@ -1,5 +1,6 @@
 'use strict';
 var map;
+var yelpData;
 var startPoint = {lat:37.773972, lng: -122.431297};
 var searchBox;
 var places;
@@ -10,8 +11,6 @@ var labelIndex = 0;
 var infowindow;
 var directionsDisplay;
 var directionsService;
-var vicinity;
-
 
 //Add google maps to screen with search box
 function initMap(){
@@ -24,106 +23,12 @@ function initMap(){
 
 	infowindow = new google.maps.InfoWindow;
 
-	findLocation();
+	view.findLocation();
 
-	addSearch();
+	view.addSearch();
 
 	map.controls[google.maps.ControlPosition.LEFT_TOP].push(
 		document.getElementById('legend'));
-}
-
-//Search box, used to find starting point for plan
-function addSearch (){
-	// Create the search box and link it to the UI element.
-	var input = document.getElementById('pac-input');
-	searchBox = new google.maps.places.SearchBox(input);
-	var bounds = new google.maps.LatLngBounds();
-	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-	//Bias the SearchBox results towards current map's viewport.
-	map.addListener('bounds_changed', function() {
-		searchBox.setBounds(map.getBounds());
-	});
-
-	// Listen for the event fired when the user selects a prediction and retrieve
-	// more details for that place.
-	searchBox.addListener('places_changed', function() {
-		places = searchBox.getPlaces();
-			if (places.length === 0) {
-				return;
-			}
-		places.forEach(function(place) {
-			var name = place.name;
-			var position = place.geometry.location;
-			vicinity = place.vicinity;
-
-			view.addPlace(name, position, vicinity);
-
-			if (place.geometry.viewport) {
-			// Only geocodes have viewport.
-				bounds.union(place.geometry.viewport);
-			} else {
-				bounds.extend(place.geometry.location);
-			}
-
-		//map.fitBounds(bounds);
-	});
-});
-}
-
-function findLocation (){
-	map = map;
-	var browserSupportFlag =  new Boolean();
-	var initialLocation;
-	var pos;
-	var geocoder = new google.maps.Geocoder;
-
-	directionsDisplay = new google.maps.DirectionsRenderer();
-	directionsService = new google.maps.DirectionsService();
-
-	// Try W3C Geolocation (Preferred)
-	if(navigator.geolocation) {
-		browserSupportFlag = true;
-		navigator.geolocation.getCurrentPosition(function(position) {
-			initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-			map.setCenter(initialLocation);
-			geocodeLatLng(initialLocation);
-			view.addPlace("Starting Point", initialLocation, vicinity);
-		}, function() {
-			handleNoGeolocation(browserSupportFlag);
-		});
-	}
-	// Browser doesn't support Geolocation
-	else {
-		browserSupportFlag = false;
-		handleNoGeolocation(browserSupportFlag);
-	}
-
-	function handleNoGeolocation(errorFlag) {
-		if (errorFlag == true) {
-			alert("Geolocation service failed, enter your starting location in the search field in the map");
-			map.setCenter(startPoint);
-		} else {
-			alert("Geolocation service failed, enter your starting location in the search field in the map");
-			map.setCenter(startPoint);
-		}
-	}
-
-	function geocodeLatLng(where){
-		var latlng = where;
-		geocoder.geocode({'location': latlng}, function(results, status){
-			if (status === google.maps.GeocoderStatus.OK) {
-				if (results[1]) {
-					vicinity = results[1].address_components[1].long_name;
-					//console.log(vicinity);
-				} else {
-				window.alert('No results found');
-				}
-				} else {
-				window.alert('Geocoder failed due to: ' + status);
-				}
-		})
-	}
 }
 
 //Search google places by type
@@ -140,7 +45,7 @@ function findThings (what){
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
-				if(results[i].rating > 4){
+				//if(results[i].rating > 4){
 					console.log(results[i]);
 					var place = results[i];
 					var name = place.name;
@@ -150,13 +55,14 @@ function findThings (what){
 
 					view.addPlace(name, position);
 					//createMarker(results[i]);)
-				}
+				//}
 			}
 		}
 	}
 	view.showOptions(false);
 }
 
+//Show infowindow box for the current item
 function showInfo (where, marker){
 	var contentString = where;
 	map = map;
@@ -171,6 +77,7 @@ function showInfo (where, marker){
 	infowindow.open(map, marker);
 }
 
+//Get google directions from starting point to current item
 function getDirections (where){
 	map = map;
 
@@ -213,20 +120,115 @@ var Place = function(name, position, vicinity){
 
 var ViewModel = function(){
 	var self = this;
+	var vicinity;
+	var cll;
+
 	self.showOptions = ko.observable(true);
 	self.listView = ko.observableArray([]);
+	self.currentPlace = ko.observable();
 
-	//Add a place to an observable array
-	self.addPlace = function (name, position, vicinity){
-		self.listView.push(new Place(name, position, vicinity));
+	//Use W3C Geolocation to find users current position
+	self.findLocation = function(){
+		var browserSupportFlag =  new Boolean();
+		var initialLocation;
+		var pos;
+		var geocoder = new google.maps.Geocoder;
+
+		directionsDisplay = new google.maps.DirectionsRenderer();
+		directionsService = new google.maps.DirectionsService();
+
+		// Try W3C Geolocation (Preferred)
+		if(navigator.geolocation) {
+			browserSupportFlag = true;
+			navigator.geolocation.getCurrentPosition(function(position) {
+				cll = position.coords.latitude+','+position.coords.longitude;
+				initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+				map.setCenter(initialLocation);
+				geocodeLatLng(initialLocation);
+				view.addPlace("Starting Point", initialLocation, vicinity);
+			}, function() {
+				handleNoGeolocation(browserSupportFlag);
+			});
+		}
+		// Browser doesn't support Geolocation
+		else {
+			browserSupportFlag = false;
+			handleNoGeolocation(browserSupportFlag);
+		}
+
+		function handleNoGeolocation(errorFlag) {
+			if (errorFlag == true) {
+				alert("Geolocation service failed, enter your starting location in the search field in the map");
+				map.setCenter(startPoint);
+			} else {
+				alert("Geolocation service failed, enter your starting location in the search field in the map");
+				map.setCenter(startPoint);
+			}
+		}
+
+		function geocodeLatLng(where){
+			var latlng = where;
+			geocoder.geocode({'location': latlng}, function(results, status){
+				if (status === google.maps.GeocoderStatus.OK) {
+					if (results[1]) {
+						vicinity = results[1].address_components[1].long_name;
+						//console.log(vicinity);
+					} else {
+					window.alert('No results found');
+					}
+					} else {
+					window.alert('Geocoder failed due to: ' + status);
+					}
+			})
+		}
 	};
 
-	self.currentPlace = ko.observable();
+	//Search box, used to find starting point for plan if unable to use geolocation
+	self.addSearch = function (){
+		// Create the search box and link it to the UI element.
+		var input = document.getElementById('pac-input');
+		searchBox = new google.maps.places.SearchBox(input);
+		var bounds = new google.maps.LatLngBounds();
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+		//Bias the SearchBox results towards current map's viewport.
+		map.addListener('bounds_changed', function() {
+			searchBox.setBounds(map.getBounds());
+		});
+
+		// Listen for the event fired when the user selects a prediction and retrieve
+		// more details for that place.
+		searchBox.addListener('places_changed', function() {
+			places = searchBox.getPlaces();
+			if (places.length === 0) {
+				return;
+			}
+			
+			places.forEach(function(place) {
+				var name = place.name;
+				var position = place.geometry.location;
+				vicinity = place.vicinity;
+				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
+
+				view.addPlace(name, position, vicinity);
+
+				if (place.geometry.viewport) {
+				// Only geocodes have viewport.
+					bounds.union(place.geometry.viewport);
+				} else {
+					bounds.extend(place.geometry.location);
+				}
+
+			//map.fitBounds(bounds);
+			});
+		});
+	};
 
 	//Defines types for the findThings function to search
 	self.seePlaces = function (){
 		var forSearch = [];
 
+		//TODO: Ensure no more then 5 search terms for yelp api
 		$('input[name="whatToDo"]:checked').each(function(){
 			var input = this.value;
 			switch (input) {
@@ -237,7 +239,7 @@ var ViewModel = function(){
 					input = ['art_gallery', 'library', 'museum'];
 					break;
 				case 'amusement':
-					input = ['amusement_park', 'bowling_alley', 'museum', 'stadium'];
+					input = ['amusement_park', 'bowling_alley', 'museum'];
 					break;
 				case 'animals':
 					input = ['aquarium', 'zoo'];
@@ -246,18 +248,23 @@ var ViewModel = function(){
 				forSearch = forSearch.concat(input);
 		});
 		//console.log(forSearch);
-		findThings(forSearch);
-		yelpHell(forSearch, vicinity);
+		//findThings(forSearch);
+		yelpHell(forSearch, vicinity, cll);
 	};
 
+
+	//Add a place to an observable array
+	self.addPlace = function (name, position, vicinity){
+		self.listView.push(new Place(name, position, vicinity));
+	};
+
+	//Sets the current place to clicked list item
 	self.setPlace = function(clickedPlace){
 		self.currentPlace(clickedPlace);
 		showInfo(self.currentPlace().name, self.currentPlace().marker);
 		//console.log(self.currentPlace.name);
 		getDirections(self.currentPlace().position);
 	}
-
-
 };
 
 view = new ViewModel();
