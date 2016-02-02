@@ -45,17 +45,16 @@ function findThings (what){
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
-				//if(results[i].rating > 4){
-					console.log(results[i]);
-					var place = results[i];
-					var name = place.name;
-					//var googleRate = place.rating;
-					var position = place.geometry.location;
-					//var icon = view.icon(markers);
-
-					view.addPlace(name, position);
-					//createMarker(results[i]);)
-				//}
+				var yelp = yelpData.businesses; 
+				//console.log(results[i]);
+				var place = results[i];
+				var name = place.name;
+				var position = place.geometry.location;
+				for(var j = 0; j < yelpData.businesses.length; j++){
+					if(name === yelp[j].name && (place.rating >= 3.5 || yelp[j].rating >= 3.5)){
+						view.addPlace(name, position);
+					}
+				}	
 			}
 		}
 	}
@@ -248,8 +247,8 @@ var ViewModel = function(){
 				forSearch = forSearch.concat(input);
 		});
 		//console.log(forSearch);
-		//findThings(forSearch);
 		yelpHell(forSearch, vicinity, cll);
+		//findThings(forSearch);
 	};
 
 

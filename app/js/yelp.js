@@ -14,6 +14,9 @@ function yelpHell (what, where, position){
 		location: where,
 		cll: position,
 		radius_filter: 1609,
+		sort: 2,
+		limit: 20,
+		offset: 20,
 		oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
 		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',
 		oauth_nonce: nonce_generate(),
@@ -37,6 +40,7 @@ function yelpHell (what, where, position){
 		success: function(results) {
 			yelpData = Object.assign({}, results);
 			console.log("SUCCCESS! %o", results);
+			findThings(what);
 		},
 		error: function(error) {
 		// Do stuff on fail
