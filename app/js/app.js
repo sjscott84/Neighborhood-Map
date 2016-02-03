@@ -1,12 +1,13 @@
 'use strict';
 var map;
 var yelpData;
+var googleData = [];
 var startPoint = {lat:37.773972, lng: -122.431297};
 var searchBox;
 var places;
 var view;
 var markers = [];
-var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
 var labelIndex = 0;
 var infowindow;
 var directionsDisplay;
@@ -35,7 +36,7 @@ function initMap(){
 function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
-	service.nearbySearch({
+		service.nearbySearch({
 		location: markers[0].position,
 		//radius: '500',
 		types: what,
@@ -45,25 +46,43 @@ function findThings (what){
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
-				var yelp = yelpData.businesses; 
+				//var yelp = yelpData.businesses; 
 				//console.log(results[i]);
 				var place = results[i];
-				var name = place.name;
-				var position = place.geometry.location;
-				for(var j = 0; j < yelpData.businesses.length; j++){
-					if(name === yelp[j].name && (place.rating >= 3.5 || yelp[j].rating >= 3.5)){
-						view.addPlace(name, position);
-					}
-				}	
+				if(place.rating >= 3.5){
+					var name = place.name;
+					var position = place.geometry.location;
+					var rating = place.rating;
+					googleData.push({name: name, position: position, rating: rating});
+							//view.addPlace(name, position);	
+				}
 			}
 		}
 	}
 	view.showOptions(false);
+	displayPlaces();
+}
+
+function displayPlaces (){
+	var yelp = yelpData.businesses;
+	for(var i = 0; i<yelp.length; i++){
+		if(yelp[i].rating >= 3.5){
+			try{
+				var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
+				view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
+			}catch(e){
+				i++;
+			}
+		}
+	}
+	for(var j = 0; j<googleData.length; j++){
+		view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating);
+	}
 }
 
 //Show infowindow box for the current item
-function showInfo (where, marker){
-	var contentString = where;
+function showInfo (where, marker, rating, what,url){
+	var contentString = where+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
 	map = map;
 	//infowindow = new google.maps.InfoWindow;
 
@@ -99,13 +118,31 @@ function getDirections (where){
 	});
 }
 
-//Holds the google map search results
-var Place = function(name, position, vicinity){
+
+var StartPlace = function(name, position, vicinity){
 	this.map = map;
 	this.name = name;
 	this.position = position;
-	this.vicinity = vicinity
+	this.vicinity = vicinity;
 	//this.icon = icon;
+	this.marker = new google.maps.Marker({
+			map: map,
+			title: name,
+			icon: 'http://maps.gstatic.com/mapfiles/markers2/marker_greenA.png',
+			position: this.position,
+		});
+
+	markers.push(this.marker);
+	this.listName = "A - "+name;
+};
+
+var Place = function(name, position, rating, what, url){
+	this.map = map;
+	this.name = name;
+	this.position = position;
+	this.rating = rating;
+	this.what = what;
+	this.url = url;
 	this.marker = new google.maps.Marker({
 			map: map,
 			title: name,
@@ -130,7 +167,6 @@ var ViewModel = function(){
 	self.findLocation = function(){
 		var browserSupportFlag =  new Boolean();
 		var initialLocation;
-		var pos;
 		var geocoder = new google.maps.Geocoder;
 
 		directionsDisplay = new google.maps.DirectionsRenderer();
@@ -144,7 +180,7 @@ var ViewModel = function(){
 				initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
 				map.setCenter(initialLocation);
 				geocodeLatLng(initialLocation);
-				view.addPlace("Starting Point", initialLocation, vicinity);
+				view.addStartPlace("Starting Point", initialLocation, vicinity);
 			}, function() {
 				handleNoGeolocation(browserSupportFlag);
 			});
@@ -156,7 +192,7 @@ var ViewModel = function(){
 		}
 
 		function handleNoGeolocation(errorFlag) {
-			if (errorFlag == true) {
+			if (errorFlag === true) {
 				alert("Geolocation service failed, enter your starting location in the search field in the map");
 				map.setCenter(startPoint);
 			} else {
@@ -170,7 +206,7 @@ var ViewModel = function(){
 			geocoder.geocode({'location': latlng}, function(results, status){
 				if (status === google.maps.GeocoderStatus.OK) {
 					if (results[1]) {
-						vicinity = results[1].address_components[1].long_name;
+						vicinity = results[1].formatted_address;
 						//console.log(vicinity);
 					} else {
 					window.alert('No results found');
@@ -178,7 +214,7 @@ var ViewModel = function(){
 					} else {
 					window.alert('Geocoder failed due to: ' + status);
 					}
-			})
+			});
 		}
 	};
 
@@ -206,10 +242,11 @@ var ViewModel = function(){
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
-				vicinity = place.vicinity;
+				//vicinity = place.vicinity;
+				vicinity = place.formatted_address;
 				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
 
-				view.addPlace(name, position, vicinity);
+				self.addStartPlace(name, position, vicinity);
 
 				if (place.geometry.viewport) {
 				// Only geocodes have viewport.
@@ -218,7 +255,7 @@ var ViewModel = function(){
 					bounds.extend(place.geometry.location);
 				}
 
-			//map.fitBounds(bounds);
+				//map.fitBounds(bounds);
 			});
 		});
 	};
@@ -232,16 +269,19 @@ var ViewModel = function(){
 			var input = this.value;
 			switch (input) {
 				case 'outdoors':
-					input = ['park', 'zoo'];
+					//input = [''park', 'zoo''];
+					input = 'parks,playgrounds,gardens,farms,observatories,beaches,hiking,horsebackriding,skatingrinks,swimmingpools,waterparks';
 					break;
 				case 'culture':
-					input = ['art_gallery', 'library', 'museum'];
+					//input = ['art_gallery', 'library', 'museum'];
+					input = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks';
 					break;
 				case 'amusement':
-					input = ['amusement_park', 'bowling_alley', 'museum'];
+					input = 'arcades,hauntedhouses,museums,amusementparks,carousels,gokarts,mini_golf';
 					break;
 				case 'animals':
-					input = ['aquarium', 'zoo'];
+					//input = ['aquarium', 'zoo'];
+					input = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos,skatingrinks';
 					break;
 			}
 				forSearch = forSearch.concat(input);
@@ -251,19 +291,23 @@ var ViewModel = function(){
 		//findThings(forSearch);
 	};
 
+	//Add a start place to an observable array
+	self.addStartPlace = function (name, position, vicinity){
+		self.listView.push(new StartPlace(name, position, vicinity));
+	};
 
 	//Add a place to an observable array
-	self.addPlace = function (name, position, vicinity){
-		self.listView.push(new Place(name, position, vicinity));
+	self.addPlace = function (name, position, rating, what, url){
+		self.listView.push(new Place(name, position, rating, what, url));
 	};
 
 	//Sets the current place to clicked list item
 	self.setPlace = function(clickedPlace){
 		self.currentPlace(clickedPlace);
-		showInfo(self.currentPlace().name, self.currentPlace().marker);
+		showInfo(self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
 		//console.log(self.currentPlace.name);
 		getDirections(self.currentPlace().position);
-	}
+	};
 };
 
 view = new ViewModel();

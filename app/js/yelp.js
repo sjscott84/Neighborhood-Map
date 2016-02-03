@@ -10,13 +10,14 @@ function yelpHell (what, where, position){
 	console.log(terms);
 
 	var parameters = {
-		term: terms,
+		//term: terms,
+		category_filter: terms,
 		location: where,
 		cll: position,
-		radius_filter: 1609,
-		sort: 2,
-		limit: 20,
+		//limit: 20,
 		offset: 20,
+		radius_filter: 10000, //1609,
+		sort: 2,
 		oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
 		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',
 		oauth_nonce: nonce_generate(),
