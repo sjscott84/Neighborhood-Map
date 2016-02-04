@@ -6,7 +6,7 @@ var startPoint = {lat:37.773972, lng: -122.431297};
 var searchBox;
 var places;
 var view;
-var markers = [];
+//var markers = [];
 var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
 var labelIndex = 0;
 var infowindow;
@@ -37,7 +37,7 @@ function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
 		service.nearbySearch({
-		location: markers[0].position,
+		location: view.listView()[0].position,
 		//radius: '500',
 		types: what,
 		rankBy: google.maps.places.RankBy.DISTANCE
@@ -66,7 +66,7 @@ function findThings (what){
 function displayPlaces (){
 	var yelp = yelpData.businesses;
 	for(var i = 0; i<yelp.length; i++){
-		if(yelp[i].rating >= 3.5){
+		if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
 			try{
 				var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
 				view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
@@ -81,7 +81,7 @@ function displayPlaces (){
 }
 
 //Show infowindow box for the current item
-function showInfo (where, marker, rating, what,url){
+function showInfo (where, marker, rating, what, url){
 	var contentString = where+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
 	map = map;
 	//infowindow = new google.maps.InfoWindow;
@@ -131,8 +131,6 @@ var StartPlace = function(name, position, vicinity){
 			icon: 'http://maps.gstatic.com/mapfiles/markers2/marker_greenA.png',
 			position: this.position,
 		});
-
-	markers.push(this.marker);
 	this.listName = "A - "+name;
 };
 
@@ -149,8 +147,11 @@ var Place = function(name, position, rating, what, url){
 			position: this.position,
 			label: labels[labelIndex++ % labels.length],
 		});
+	google.maps.event.addListener(this.marker, 'click', function() {
+		showInfo(name, this, rating, what, url);
+		getDirections(position);
+	});
 
-	markers.push(this.marker);
 	this.listName = this.marker.label+" - "+name;
 };
 
@@ -286,8 +287,9 @@ var ViewModel = function(){
 			}
 				forSearch = forSearch.concat(input);
 		});
-		//console.log(forSearch);
+		//search yelp api
 		yelpHell(forSearch, vicinity, cll);
+		//search google api
 		//findThings(forSearch);
 	};
 

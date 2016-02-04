@@ -11,11 +11,11 @@
 	<input id="pac-input" class="controls" type="text" placeholder="Starting Point">
 	<div id="map"></div>
 	<div id="legend" class="controls">
-			<div data-bind="visible: showOptions" class="checkbox">
-				<label><input type="checkbox" name="whatToDo" value="culture">Culture</label><br>
-				<label><input type="checkbox" name="whatToDo" value="amusement">Amusement</label>
-				<label><input type="checkbox" name="whatToDo" value="outdoors">Outdoor Pursuits</label>
-				<label><input type="checkbox" name="whatToDo" value="animals">Animals</label>
+			<div data-bind="visible: showOptions" class="radio">
+				<label><input type="radio" name="whatToDo" value="culture">Culture</label><br>
+				<label><input type="radio" name="whatToDo" value="amusement">Amusement</label>
+				<label><input type="radio" name="whatToDo" value="outdoors">Outdoor Pursuits</label>
+				<label><input type="radio" name="whatToDo" value="animals">Animals</label>
 				<button type="button" class="btn btn-default" onclick="view.seePlaces()">Get Places to See!</button>
 			</div>
 		<ul class="list-group" data-bind="foreach: listView">
