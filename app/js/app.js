@@ -6,12 +6,12 @@ var startPoint = {lat:37.773972, lng: -122.431297};
 var searchBox;
 var places;
 var view;
-//var markers = [];
 var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
 var labelIndex = 0;
 var infowindow;
 var directionsDisplay;
 var directionsService;
+var markers = [];
 
 //Add google maps to screen with search box
 function initMap(){
@@ -30,6 +30,9 @@ function initMap(){
 
 	map.controls[google.maps.ControlPosition.LEFT_TOP].push(
 		document.getElementById('legend'));
+
+	map.controls[google.maps.ControlPosition.TOP_CENTER].push(
+		document.getElementById('start'));
 }
 
 //Search google places by type
@@ -63,6 +66,7 @@ function findThings (what){
 	displayPlaces();
 }
 
+//Sort through yelp data and display
 function displayPlaces (){
 	var yelp = yelpData.businesses;
 	for(var i = 0; i<yelp.length; i++){
@@ -75,14 +79,14 @@ function displayPlaces (){
 			}
 		}
 	}
-	for(var j = 0; j<googleData.length; j++){
-		view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating);
-	}
+	//for(var j = 0; j<googleData.length; j++){
+		//view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating);
+	//}
 }
 
 //Show infowindow box for the current item
 function showInfo (where, marker, rating, what, url){
-	var contentString = where+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
+	var contentString = '<b>'+where+'</b>'+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
 	map = map;
 	//infowindow = new google.maps.InfoWindow;
 
@@ -132,6 +136,8 @@ var StartPlace = function(name, position, vicinity){
 			position: this.position,
 		});
 	this.listName = "A - "+name;
+
+	//markers.push(this.marker);
 };
 
 var Place = function(name, position, rating, what, url){
@@ -145,14 +151,17 @@ var Place = function(name, position, rating, what, url){
 			map: map,
 			title: name,
 			position: this.position,
-			label: labels[labelIndex++ % labels.length],
+			label: labels[labelIndex++ % labels.length]
 		});
 	google.maps.event.addListener(this.marker, 'click', function() {
+		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png'
 		showInfo(name, this, rating, what, url);
 		getDirections(position);
 	});
 
 	this.listName = this.marker.label+" - "+name;
+
+	//markers.push(this.marker);
 };
 
 var ViewModel = function(){
@@ -239,7 +248,15 @@ var ViewModel = function(){
 			if (places.length === 0) {
 				return;
 			}
-			
+			if (self.listView().length > 0){
+				for (var i = 0; i < self.listView().length; i++) {
+					self.listView()[i].marker.setMap(null);
+				}
+				view.showOptions(true);
+				//markers = [];
+				self.listView([]);
+				yelpData = {};
+			}
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
@@ -275,7 +292,7 @@ var ViewModel = function(){
 					break;
 				case 'culture':
 					//input = ['art_gallery', 'library', 'museum'];
-					input = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks';
+					input = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks,observatories';
 					break;
 				case 'amusement':
 					input = 'arcades,hauntedhouses,museums,amusementparks,carousels,gokarts,mini_golf';
