@@ -1,17 +1,22 @@
 
-function yelpHell (what, where, position){
+function yelpHell (what, where, position, getGoogle){
 
 	function nonce_generate() {
 		return (Math.floor(Math.random() * 1e12).toString());
 	}
 
+	var yelpError = setTimeout(function(){
+		alert("Yelp is currently unavailable, results will come from Google")
+		findThings(getGoogle);
+		;}, 5000);
+
 	var yelp_url = 'https://api.yelp.com/v2/search?';
-	var terms = what.join(', ');
-	console.log(terms);
+	//var terms = what.join(', ');
+	console.log(what);
 
 	var parameters = {
 		//term: terms,
-		category_filter: terms,
+		category_filter: what,
 		location: where,
 		cll: position,
 		//limit: 20,
@@ -19,7 +24,7 @@ function yelpHell (what, where, position){
 		radius_filter: 10000, //1609,
 		sort: 2,
 		oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
-		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',
+		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA!',//added ! for error testing
 		oauth_nonce: nonce_generate(),
 		oauth_timestamp: Math.floor(Date.now()/1000),
 		oauth_signature_method: 'HMAC-SHA1',
@@ -42,11 +47,14 @@ function yelpHell (what, where, position){
 			yelpData = Object.assign({}, results);
 			console.log("SUCCCESS! %o", results);
 			findThings(what);
-		},
-		error: function(error) {
-		// Do stuff on fail
-		console.log(error);
+			clearTimeout(yelpError);
 		}
+		//error: function(jqXHR, textStatus, errorThrown) {
+			// Do stuff on fail
+			//alert("Yelp is currently unavailable, results will come from Google")
+			//findThings(yelpError);
+			//console.log(jqXHR);
+		//}
 	};
 
 	// Send AJAX query via jQuery library.

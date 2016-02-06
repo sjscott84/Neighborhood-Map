@@ -39,49 +39,76 @@ function initMap(){
 function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
-		service.nearbySearch({
-		location: view.listView()[0].position,
-		//radius: '500',
-		types: what,
-		rankBy: google.maps.places.RankBy.DISTANCE
-		}, callback);
 
+	function placeDetailCallback(placeDetail, status){
+		if (status == google.maps.places.PlacesServiceStatus.OK) {
+			var thePlace = { 
+				name: placeDetail.name, 
+				position: placeDetail.geometry.location, 
+				type: placeDetail.types[0], 
+				rating: placeDetail.rating, 
+				url: placeDetail.website
+			}
+			googleData.push(thePlace);
+		} else {
+			console.log("error");
+		}
+	}
+		
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
 				//var yelp = yelpData.businesses; 
 				//console.log(results[i]);
 				var place = results[i];
-				if(place.rating >= 3.5){
-					var name = place.name;
-					var position = place.geometry.location;
-					var rating = place.rating;
-					googleData.push({name: name, position: position, rating: rating});
-							//view.addPlace(name, position);	
+				if(place.rating >= 3){
+					
+					var thePlace = { 
+						name: place.name, 
+						position: place.geometry.location, 
+						type: place.types[0], 
+						rating: place.rating, 
+						//url: placeDetail.website
+					}
+					googleData.push(thePlace);
+					///service.getDetails({placeId: place.place_id}, placeDetailCallback);
 				}
 			}
+
+			displayPlaces();
 		}
 	}
+
+	var seachNearByQuery = {
+		location: view.listView()[0].position,
+		//radius: '500',
+		types: what,
+		rankBy: google.maps.places.RankBy.DISTANCE
+	}
+	service.nearbySearch(seachNearByQuery, callback);
 	view.showOptions(false);
-	displayPlaces();
+	
 }
 
 //Sort through yelp data and display
 function displayPlaces (){
-	var yelp = yelpData.businesses;
-	for(var i = 0; i<yelp.length; i++){
-		if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
-			try{
-				var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
-				view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
-			}catch(e){
-				i++;
+	if(yelpData === undefined){
+		for(var j = 0; j<googleData.length; j++){
+			view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
+		}
+	}else{
+		var yelp = yelpData.businesses;
+		for(var i = 0; i<yelp.length; i++){
+			if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
+				try{
+					var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
+					view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0])//, yelp[i].url);
+				}catch(e){
+					i++;
+				}
 			}
 		}
 	}
-	//for(var j = 0; j<googleData.length; j++){
-		//view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating);
-	//}
 }
 
 //Show infowindow box for the current item
@@ -280,33 +307,34 @@ var ViewModel = function(){
 
 	//Defines types for the findThings function to search
 	self.seePlaces = function (){
-		var forSearch = [];
-
-		//TODO: Ensure no more then 5 search terms for yelp api
+		var forSearchYelp;
+		var forSearchGoogle = [];
 		$('input[name="whatToDo"]:checked').each(function(){
 			var input = this.value;
 			switch (input) {
 				case 'outdoors':
-					//input = [''park', 'zoo''];
-					input = 'parks,playgrounds,gardens,farms,observatories,beaches,hiking,horsebackriding,skatingrinks,swimmingpools,waterparks';
+					forSearchGoogle = ['park', 'zoo'];
+					forSearchYelp = 'parks,playgrounds,gardens,farms,observatories,beaches,hiking,horsebackriding,skatingrinks,swimmingpools,waterparks';
 					break;
 				case 'culture':
-					//input = ['art_gallery', 'library', 'museum'];
-					input = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks,observatories';
+					forSearchGoogle = ['art_gallery', 'library', 'museum'];
+					forSearchYelp = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks,observatories';
 					break;
 				case 'amusement':
-					input = 'arcades,hauntedhouses,museums,amusementparks,carousels,gokarts,mini_golf';
+					forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum']
+					forSearchYelp = 'arcades,hauntedhouses,museums,amusementparks,carousels,gokarts,mini_golf';
 					break;
 				case 'animals':
-					//input = ['aquarium', 'zoo'];
-					input = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos,skatingrinks';
+					forSearchGoogle = ['aquarium', 'zoo'];
+					forSearchYelp = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos,skatingrinks';
 					break;
 			}
-				forSearch = forSearch.concat(input);
+				//forSearch = forSearch.concat(input);
 		});
 		//search yelp api
-		yelpHell(forSearch, vicinity, cll);
-		//search google api
+		yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle);
+
+				//search google api
 		//findThings(forSearch);
 	};
 
