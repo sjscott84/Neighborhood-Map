@@ -40,21 +40,19 @@ function findThings (what){
 
 	var service = new google.maps.places.PlacesService(map);
 
+	//Gets google place details for specific ID
 	function placeDetailCallback(placeDetail, status){
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			var thePlace = { 
-				name: placeDetail.name, 
-				position: placeDetail.geometry.location, 
-				type: placeDetail.types[0], 
-				rating: placeDetail.rating, 
+			var placeURL = { 
 				url: placeDetail.website
 			}
-			googleData.push(thePlace);
+			googleData.push(placeURL);
 		} else {
 			console.log("error");
 		}
 	}
-		
+
+	//Gets a list of google places for a starting point
 	function callback(results, status){
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
 			for (var i = 0; i < results.length; i++) {
@@ -71,7 +69,7 @@ function findThings (what){
 						//url: placeDetail.website
 					}
 					googleData.push(thePlace);
-					///service.getDetails({placeId: place.place_id}, placeDetailCallback);
+					//service.getDetails({placeId: place.place_id}, placeDetailCallback);
 				}
 			}
 
@@ -113,15 +111,22 @@ function displayPlaces (){
 
 //Show infowindow box for the current item
 function showInfo (where, marker, rating, what, url){
-	var contentString = '<b>'+where+'</b>'+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
+	var contentStringYelp = '<b>'+where+'</b>'+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
+	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Catagory: '+what+'<br>Google Rating: '+rating+'<br>'
 	map = map;
 	//infowindow = new google.maps.InfoWindow;
 
 	infowindow.close();
 
-	infowindow = new google.maps.InfoWindow({
-		content: contentString
-	});
+	if(url){
+		infowindow = new google.maps.InfoWindow({
+			content: contentStringYelp
+		});
+	}else{
+		infowindow = new google.maps.InfoWindow({
+			content: contentStringGoogle
+		});
+	}
 
 	infowindow.open(map, marker);
 }
