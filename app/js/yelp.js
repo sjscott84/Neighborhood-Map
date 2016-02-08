@@ -24,7 +24,7 @@ function yelpHell (what, where, position, getGoogle){
 		radius_filter: 10000, //1609,
 		sort: 2,
 		oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
-		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA!',//added ! for error testing
+		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',//added ! for error testing
 		oauth_nonce: nonce_generate(),
 		oauth_timestamp: Math.floor(Date.now()/1000),
 		oauth_signature_method: 'HMAC-SHA1',
@@ -46,7 +46,7 @@ function yelpHell (what, where, position, getGoogle){
 		success: function(results) {
 			yelpData = Object.assign({}, results);
 			console.log("SUCCCESS! %o", results);
-			findThings(what);
+			displayPlaces();
 			clearTimeout(yelpError);
 		}
 		//error: function(jqXHR, textStatus, errorThrown) {
@@ -59,4 +59,5 @@ function yelpHell (what, where, position, getGoogle){
 
 	// Send AJAX query via jQuery library.
 	$.ajax(settings);
+
 }

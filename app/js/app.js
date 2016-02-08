@@ -100,7 +100,7 @@ function displayPlaces (){
 			if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
 				try{
 					var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
-					view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0])//, yelp[i].url);
+					view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
 				}catch(e){
 					i++;
 				}
