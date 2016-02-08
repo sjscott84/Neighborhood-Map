@@ -73,7 +73,11 @@ function findThings (what){
 				}
 			}
 
-			displayPlaces();
+			if(googleData.length === 0){
+				alert("There are no google results that match your search, please try a new starting point")
+			}else{
+				displayPlaces();
+			}
 		}
 	}
 
@@ -90,7 +94,7 @@ function findThings (what){
 
 //Sort through yelp data and display
 function displayPlaces (){
-	if(yelpData === undefined){
+	if(yelpData === undefined || jQuery.isEmptyObject(yelpData)){
 		for(var j = 0; j<googleData.length; j++){
 			view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
 		}
@@ -106,6 +110,9 @@ function displayPlaces (){
 				}
 			}
 		}
+	}
+	if(view.listView().length === 1){
+		alert("There are no yelp results that match your search, please try a new starting point")
 	}
 }
 
@@ -283,11 +290,15 @@ var ViewModel = function(){
 			if (self.listView().length > 0){
 				for (var i = 0; i < self.listView().length; i++) {
 					self.listView()[i].marker.setMap(null);
+					directionsDisplay.setMap(null);
+					directionsDisplay.setPanel(null);
+					labels[labelIndex=0];
 				}
 				view.showOptions(true);
 				//markers = [];
 				self.listView([]);
 				yelpData = {};
+				googleData = [];
 			}
 			places.forEach(function(place) {
 				var name = place.name;
@@ -305,7 +316,7 @@ var ViewModel = function(){
 					bounds.extend(place.geometry.location);
 				}
 
-				//map.fitBounds(bounds);
+				map.fitBounds(bounds);
 			});
 		});
 	};
@@ -338,9 +349,6 @@ var ViewModel = function(){
 		});
 		//search yelp api
 		yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle);
-
-				//search google api
-		//findThings(forSearch);
 	};
 
 	//Add a start place to an observable array
