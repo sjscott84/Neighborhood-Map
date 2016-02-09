@@ -88,8 +88,6 @@ function findThings (what){
 		rankBy: google.maps.places.RankBy.DISTANCE
 	}
 	service.nearbySearch(seachNearByQuery, callback);
-	view.showOptions(false);
-	
 }
 
 //Sort through yelp data and display
@@ -114,12 +112,21 @@ function displayPlaces (){
 	if(view.listView().length === 1){
 		alert("There are no yelp results that match your search, please try a new starting point")
 	}
+
+	for(var i = 1; i<view.listView().length; i++){
+		if(jQuery.inArray(view.listView()[i].what, view.dataType()) === -1){
+			view.dataType.push(view.listView()[i].what);
+		}
+	}
+
+	view.showOptions(false);
+	view.showFilter(true);
 }
 
 //Show infowindow box for the current item
 function showInfo (where, marker, rating, what, url){
-	var contentStringYelp = '<b>'+where+'</b>'+'<br>Catagory: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
-	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Catagory: '+what+'<br>Google Rating: '+rating+'<br>'
+	var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
+	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>'
 	map = map;
 	//infowindow = new google.maps.InfoWindow;
 
@@ -211,6 +218,8 @@ var ViewModel = function(){
 	self.showOptions = ko.observable(true);
 	self.listView = ko.observableArray([]);
 	self.currentPlace = ko.observable();
+	self.dataType = ko.observableArray(["All"]);
+	self.showFilter = ko.observable(false);
 
 	//Use W3C Geolocation to find users current position
 	self.findLocation = function(){
@@ -295,10 +304,12 @@ var ViewModel = function(){
 					labels[labelIndex=0];
 				}
 				view.showOptions(true);
+				view.showFilter(false);
 				//markers = [];
 				self.listView([]);
 				yelpData = {};
 				googleData = [];
+				self.dataType(["All"]);
 			}
 			places.forEach(function(place) {
 				var name = place.name;
