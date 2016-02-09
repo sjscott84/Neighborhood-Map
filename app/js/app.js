@@ -220,6 +220,7 @@ var ViewModel = function(){
 	self.currentPlace = ko.observable();
 	self.dataType = ko.observableArray(["All"]);
 	self.showFilter = ko.observable(false);
+	self.currentFilter = ko.observable();
 
 	//Use W3C Geolocation to find users current position
 	self.findLocation = function(){
@@ -348,7 +349,7 @@ var ViewModel = function(){
 					forSearchYelp = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks,observatories';
 					break;
 				case 'amusement':
-					forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum']
+					forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum'];
 					forSearchYelp = 'arcades,hauntedhouses,museums,amusementparks,carousels,gokarts,mini_golf';
 					break;
 				case 'animals':
@@ -379,10 +380,26 @@ var ViewModel = function(){
 		//console.log(self.currentPlace.name);
 		getDirections(self.currentPlace().position);
 	};
-};
+
+	//TODO: Filter markers as well
+	self.filterView = ko.computed(function(){
+		if(self.currentFilter() === "All"){
+			return self.listView();
+		}
+		if (!self.currentFilter()) {
+			return self.listView();
+		} else {
+			return ko.utils.arrayFilter(self.listView(), function (prod) {
+			return prod.what == self.currentFilter();
+			});
+		}
+	});
+
+	self.filter = function (genre) {
+		self.currentFilter(genre);
+	};
+}
 
 view = new ViewModel();
 
 ko.applyBindings(view);
-
-

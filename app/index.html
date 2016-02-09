@@ -21,9 +21,9 @@
 		</div>
 
 		<p data-bind="visible:showFilter">Filter by Type</p>
-		<select data-bind="options:dataType, visible:showFilter"></select>
+		<select data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
 
-		<ul class="list-group" data-bind="foreach: listView">
+		<ul class="list-group" data-bind="foreach: filterView">
 			<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
 		</ul>
 
