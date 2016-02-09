@@ -384,13 +384,24 @@ var ViewModel = function(){
 	//TODO: Filter markers as well
 	self.filterView = ko.computed(function(){
 		if(self.currentFilter() === "All"){
+			for(var i = 0; i<self.listView().length; i++){
+				self.listView()[i].marker.setMap(map);
+			}
 			return self.listView();
 		}
 		if (!self.currentFilter()) {
 			return self.listView();
 		} else {
 			return ko.utils.arrayFilter(self.listView(), function (prod) {
-			return prod.what == self.currentFilter();
+				for (var i = 1; i < self.listView().length; i++) {
+					if(self.listView()[i].what !== self.currentFilter()){
+						self.listView()[i].marker.setMap(null);
+					}else{
+						//(self.listView()[i].what === self.currentFilter())
+						self.listView()[i].marker.setMap(map);
+					}
+				}
+				return prod.what == self.currentFilter();
 			});
 		}
 	});
