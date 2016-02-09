@@ -124,9 +124,10 @@ function displayPlaces (){
 }
 
 //Show infowindow box for the current item
-function showInfo (where, marker, rating, what, url){
-	var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a>';
-	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>'
+function showInfo (where, marker, rating, what, url, distance, duration){
+	var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration+'<br>';
+	map = map;;
+	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance+' about '+duration+'<br>';
 	map = map;
 	//infowindow = new google.maps.InfoWindow;
 
@@ -146,12 +147,14 @@ function showInfo (where, marker, rating, what, url){
 }
 
 //Get google directions from starting point to current item
-function getDirections (where){
+function getDirections (where, name, marker, rating, what, url){
 	map = map;
+	var distance;
+	var duration;
 
 	directionsDisplay.setMap(map);
 	directionsDisplay.setOptions( { suppressMarkers: true } );
-	directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+	//directionsDisplay.setPanel(document.getElementById("directionsPanel"));
 
 	var start = view.listView()[0].position;
 	var end = where;
@@ -164,8 +167,12 @@ function getDirections (where){
 	directionsService.route(request, function(result, status) {
 		if (status == google.maps.DirectionsStatus.OK) {
 			directionsDisplay.setDirections(result);
+			var distance = result.routes[0].legs[0].distance.text;
+			var duration = result.routes[0].legs[0].duration.text;
+			showInfo(name, marker, rating, what, url, distance, duration);
 		}
 	});
+
 }
 
 
@@ -201,8 +208,8 @@ var Place = function(name, position, rating, what, url){
 		});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png'
-		showInfo(name, this, rating, what, url);
-		getDirections(position);
+		getDirections(position, name, this, rating, what, url);
+		//showInfo(name, this, rating, what, url);
 	});
 
 	this.listName = this.marker.label+" - "+name;
@@ -376,9 +383,9 @@ var ViewModel = function(){
 	//Sets the current place to clicked list item
 	self.setPlace = function(clickedPlace){
 		self.currentPlace(clickedPlace);
-		showInfo(self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
+		//showInfo(self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
 		//console.log(self.currentPlace.name);
-		getDirections(self.currentPlace().position);
+		getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
 	};
 
 	//TODO: Filter markers as well
