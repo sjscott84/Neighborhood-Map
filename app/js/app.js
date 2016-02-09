@@ -386,6 +386,8 @@ var ViewModel = function(){
 		if(self.currentFilter() === "All"){
 			for(var i = 0; i<self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
+				directionsDisplay.setMap(null);
+				directionsDisplay.setPanel(null);
 			}
 			return self.listView();
 		}
@@ -393,6 +395,8 @@ var ViewModel = function(){
 			return self.listView();
 		} else {
 			return ko.utils.arrayFilter(self.listView(), function (prod) {
+				directionsDisplay.setMap(null);
+				directionsDisplay.setPanel(null);
 				for (var i = 1; i < self.listView().length; i++) {
 					if(self.listView()[i].what !== self.currentFilter()){
 						self.listView()[i].marker.setMap(null);
