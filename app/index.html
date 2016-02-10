@@ -11,7 +11,8 @@
 
 	<div id="map"></div>
 	<input id="pac-input" class="controls" type="text" placeholder="Starting Point">
-	<div id="legend" class="controls">
+
+	<div id="googleOverlay" class="controls">
 		<div data-bind="visible: showOptions" class="radio">
 			<label><input type="radio" name="whatToDo" value="culture">Culture</label><br>
 			<label><input type="radio" name="whatToDo" value="amusement">Amusement</label>
@@ -19,17 +20,16 @@
 			<label><input type="radio" name="whatToDo" value="animals">Animals</label>
 			<button type="button" class="btn btn-default" onclick="view.seePlaces()">Get Places to See!</button>
 		</div>
+		<div id="legend" data-bind="visible: showLegend">
+			<p data-bind="visible:showFilter">Filter by Type</p>
+			<select data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
 
-		<p data-bind="visible:showFilter">Filter by Type</p>
-		<select data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
+			<ul class="list-group" data-bind="foreach: filterView">
+				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
+			</ul>
+		</div>
 
-		<ul class="list-group" data-bind="foreach: filterView">
-			<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
-		</ul>
-
-
-		<div id="directionsPanel"></div>
-
+		<div id="directionsPanel" data-bind="visible: showDirections"></div>
 	</div>
 
 	<script src="js/knockout-3.4.0.js"></script>

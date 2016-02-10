@@ -25,14 +25,10 @@ function initMap(){
 	infowindow = new google.maps.InfoWindow;
 
 	view.findLocation();
-
 	view.addSearch();
 
 	map.controls[google.maps.ControlPosition.LEFT_TOP].push(
-		document.getElementById('legend'));
-
-	map.controls[google.maps.ControlPosition.TOP_CENTER].push(
-		document.getElementById('start'));
+		document.getElementById('googleOverlay'));
 }
 
 //Search google places by type
@@ -125,10 +121,12 @@ function displayPlaces (){
 
 //Show infowindow box for the current item
 function showInfo (where, marker, rating, what, url, distance, duration){
-	var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration+'<br>';
-	map = map;;
+	var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating
+	+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration
+	+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Take Me Here!</button>';
+	//map = map;;
 	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance+' about '+duration+'<br>';
-	map = map;
+	//map = map;
 	//infowindow = new google.maps.InfoWindow;
 
 	infowindow.close();
@@ -154,7 +152,7 @@ function getDirections (where, name, marker, rating, what, url){
 
 	directionsDisplay.setMap(map);
 	directionsDisplay.setOptions( { suppressMarkers: true } );
-	//directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+	directionsDisplay.setPanel(document.getElementById("directionsPanel"));
 
 	var start = view.listView()[0].position;
 	var end = where;
@@ -172,7 +170,6 @@ function getDirections (where, name, marker, rating, what, url){
 			showInfo(name, marker, rating, what, url, distance, duration);
 		}
 	});
-
 }
 
 
@@ -208,6 +205,7 @@ var Place = function(name, position, rating, what, url){
 		});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png'
+		view.showFullLegend();
 		getDirections(position, name, this, rating, what, url);
 		//showInfo(name, this, rating, what, url);
 	});
@@ -223,6 +221,8 @@ var ViewModel = function(){
 	var cll;
 
 	self.showOptions = ko.observable(true);
+	self.showLegend = ko.observable(true);
+	self.showDirections = ko.observable(false);
 	self.listView = ko.observableArray([]);
 	self.currentPlace = ko.observable();
 	self.dataType = ko.observableArray(["All"]);
@@ -383,6 +383,7 @@ var ViewModel = function(){
 	//Sets the current place to clicked list item
 	self.setPlace = function(clickedPlace){
 		self.currentPlace(clickedPlace);
+		self.showFullLegend();
 		//showInfo(self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
 		//console.log(self.currentPlace.name);
 		getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
@@ -420,6 +421,16 @@ var ViewModel = function(){
 	self.filter = function (genre) {
 		self.currentFilter(genre);
 	};
+
+	self.showDetailedDirections = function (){
+			self.showLegend(false);
+			self.showDirections(true);
+	};
+
+	self.showFullLegend = function (){
+		self.showDirections(false);
+		self.showLegend(true);
+	}
 }
 
 view = new ViewModel();

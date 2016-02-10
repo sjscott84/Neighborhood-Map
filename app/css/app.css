@@ -55,7 +55,7 @@ html, body {
 	font-weight: 300;
 }
 
-#legend {
+#googleOverlay {
 	background-color: #fff;
 	font-family: Roboto;
 	font-size: 15px;
@@ -68,3 +68,4 @@ html, body {
 	padding-right: 10px;
 	overflow: scroll;
 }
+
