@@ -7,7 +7,7 @@ function yelpHell (what, where, position, getGoogle){
 
 	var yelpError = setTimeout(function(){
 		alert("Yelp is currently unavailable, results will come from Google")
-		findThings(getGoogle);
+		view.findThings(getGoogle);
 		;}, 5000);
 
 	var yelp_url = 'https://api.yelp.com/v2/search?';
@@ -46,7 +46,7 @@ function yelpHell (what, where, position, getGoogle){
 		success: function(results) {
 			yelpData = Object.assign({}, results);
 			console.log("SUCCCESS! %o", results);
-			displayPlaces();
+			view.displayPlaces();
 			clearTimeout(yelpError);
 		}
 		//error: function(jqXHR, textStatus, errorThrown) {

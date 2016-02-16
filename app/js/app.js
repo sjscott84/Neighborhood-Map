@@ -1,17 +1,17 @@
 'use strict';
 var map;
-var yelpData;
-var googleData = [];
-var startPoint = {lat:37.773972, lng: -122.431297};
-var searchBox;
-var places;
 var view;
-var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
-var labelIndex = 0;
-var infowindow;
-var directionsDisplay;
-var directionsService;
-var markers = [];
+var startPoint = {lat:37.773972, lng: -122.431297};
+var infowindow;	
+var yelpData;
+	var googleData = [];
+	var searchBox;
+	var places;
+	var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
+	var labelIndex = 0;
+	var directionsDisplay;
+	var directionsService;
+	var markers = [];
 
 //Add google maps to screen with search box
 function initMap(){
@@ -30,148 +30,6 @@ function initMap(){
 	map.controls[google.maps.ControlPosition.LEFT_TOP].push(
 		document.getElementById('googleOverlay'));
 }
-
-//Search google places by type
-function findThings (what){
-
-	var service = new google.maps.places.PlacesService(map);
-
-	//Gets google place details for specific ID
-	function placeDetailCallback(placeDetail, status){
-		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			var placeURL = { 
-				url: placeDetail.website
-			}
-			googleData.push(placeURL);
-		} else {
-			console.log("error");
-		}
-	}
-
-	//Gets a list of google places for a starting point
-	function callback(results, status){
-		if (status === google.maps.places.PlacesServiceStatus.OK) {
-			for (var i = 0; i < results.length; i++) {
-				//var yelp = yelpData.businesses; 
-				//console.log(results[i]);
-				var place = results[i];
-				if(place.rating >= 3){
-					
-					var thePlace = { 
-						name: place.name, 
-						position: place.geometry.location, 
-						type: place.types[0], 
-						rating: place.rating, 
-						//url: placeDetail.website
-					}
-					googleData.push(thePlace);
-					//service.getDetails({placeId: place.place_id}, placeDetailCallback);
-				}
-			}
-
-			if(googleData.length === 0){
-				alert("There are no google results that match your search, please try a new starting point")
-			}else{
-				displayPlaces();
-			}
-		}
-	}
-
-	var seachNearByQuery = {
-		location: view.listView()[0].position,
-		//radius: '500',
-		types: what,
-		rankBy: google.maps.places.RankBy.DISTANCE
-	}
-	service.nearbySearch(seachNearByQuery, callback);
-}
-
-//Sort through yelp data and display
-function displayPlaces (){
-	if(yelpData === undefined || jQuery.isEmptyObject(yelpData)){
-		for(var j = 0; j<googleData.length; j++){
-			view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
-		}
-	}else{
-		var yelp = yelpData.businesses;
-		for(var i = 0; i<yelp.length; i++){
-			if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
-				try{
-					var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
-					view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
-				}catch(e){
-					i++;
-				}
-			}
-		}
-	}
-	if(view.listView().length === 1){
-		alert("There are no yelp results that match your search, please try a new starting point")
-	}
-
-	for(var i = 1; i<view.listView().length; i++){
-		if(jQuery.inArray(view.listView()[i].what, view.dataType()) === -1){
-			view.dataType.push(view.listView()[i].what);
-		}
-	}
-
-	view.showOptions(false);
-	view.showFilter(true);
-}
-
-//Show infowindow box for the current item
-function showInfo (where, marker, rating, what, url, distance, duration){
-	var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating
-	+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration
-	+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Take Me Here!</button>';
-	//map = map;;
-	var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance+' about '+duration+'<br>';
-	//map = map;
-	//infowindow = new google.maps.InfoWindow;
-
-	infowindow.close();
-
-	if(url){
-		infowindow = new google.maps.InfoWindow({
-			content: contentStringYelp
-		});
-	}else{
-		infowindow = new google.maps.InfoWindow({
-			content: contentStringGoogle
-		});
-	}
-
-	infowindow.open(map, marker);
-}
-
-//Get google directions from starting point to current item
-function getDirections (where, name, marker, rating, what, url){
-	map = map;
-	var distance;
-	var duration;
-
-	directionsDisplay.setMap(map);
-	directionsDisplay.setOptions( { suppressMarkers: true } );
-	directionsDisplay.setPanel(document.getElementById("directionsPanel"));
-
-	var start = view.listView()[0].position;
-	var end = where;
-	var request = {
-		origin:start,
-		destination:end,
-		travelMode: google.maps.TravelMode.WALKING
-	};
-
-	directionsService.route(request, function(result, status) {
-		if (status == google.maps.DirectionsStatus.OK) {
-			directionsDisplay.setDirections(result);
-			var distance = result.routes[0].legs[0].distance.text;
-			var duration = result.routes[0].legs[0].duration.text;
-			showInfo(name, marker, rating, what, url, distance, duration);
-		}
-	});
-}
-
 
 var StartPlace = function(name, position, vicinity){
 	this.map = map;
@@ -204,10 +62,9 @@ var Place = function(name, position, rating, what, url){
 			label: labels[labelIndex++ % labels.length]
 		});
 	google.maps.event.addListener(this.marker, 'click', function() {
-		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png'
+		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
 		view.showFullLegend();
-		getDirections(position, name, this, rating, what, url);
-		//showInfo(name, this, rating, what, url);
+		view.getDirections(position, name, this, rating, what, url);
 	});
 
 	this.listName = this.marker.label+" - "+name;
@@ -340,7 +197,7 @@ var ViewModel = function(){
 		});
 	};
 
-	//Defines types for the findThings function to search
+	//Defines types for the findThings function to search wether results come from yelp api or google places api
 	self.seePlaces = function (){
 		var forSearchYelp;
 		var forSearchGoogle = [];
@@ -384,13 +241,101 @@ var ViewModel = function(){
 	self.setPlace = function(clickedPlace){
 		self.currentPlace(clickedPlace);
 		self.showFullLegend();
-		//showInfo(self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
-		//console.log(self.currentPlace.name);
-		getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
+		self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
 	};
+
+	//Search google places api by type if yelp api fails
+	self.findThings = function (what){
+
+		var service = new google.maps.places.PlacesService(map);
+
+		//Gets google place details for specific ID
+		function placeDetailCallback(placeDetail, status){
+			if (status == google.maps.places.PlacesServiceStatus.OK) {
+				var placeURL = { 
+					url: placeDetail.website
+				};
+				googleData.push(placeURL);
+			} else {
+				console.log("error");
+			}
+		}
+
+		//Gets a list of google places for a starting point
+		function callback(results, status){
+			if (status === google.maps.places.PlacesServiceStatus.OK) {
+				for (var i = 0; i < results.length; i++) {
+					//var yelp = yelpData.businesses; 
+					//console.log(results[i]);
+					var place = results[i];
+					if(place.rating >= 3){
+						
+						var thePlace = { 
+							name: place.name, 
+							position: place.geometry.location, 
+							type: place.types[0], 
+							rating: place.rating, 
+							//url: placeDetail.website
+						};
+						googleData.push(thePlace);
+						//service.getDetails({placeId: place.place_id}, placeDetailCallback);
+					}
+				}
+
+				if(googleData.length === 0){
+					alert("There are no google results that match your search, please try a new starting point");
+				}else{
+					self.displayPlaces();
+				}
+			}
+		}
+
+		var seachNearByQuery = {
+			location: view.listView()[0].position,
+			//radius: '500',
+			types: what,
+			rankBy: google.maps.places.RankBy.DISTANCE
+		};
+		service.nearbySearch(seachNearByQuery, callback);
+	}
+
+	//Sort through yelp data and display
+	self.displayPlaces = function (){
+		if(yelpData === undefined || jQuery.isEmptyObject(yelpData)){
+			for(var j = 0; j<googleData.length; j++){
+				view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
+			}
+		}else{
+			var yelp = yelpData.businesses;
+			for(var i = 0; i<yelp.length; i++){
+				if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
+					try{
+						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
+						view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
+					}catch(e){
+						i++;
+					}
+				}
+			}
+		}
+		if(view.listView().length === 1){
+			alert("There are no yelp results that match your search, please try a new starting point");
+		}
+
+		for(var i = 1; i<view.listView().length; i++){
+			if(jQuery.inArray(view.listView()[i].what, view.dataType()) === -1){
+				view.dataType.push(view.listView()[i].what);
+			}
+		}
+
+		view.showOptions(false);
+		view.showFilter(true);
+	};
+
 
 	//TODO: Filter markers as well
 	self.filterView = ko.computed(function(){
+		//infowindow.close();
 		if(self.currentFilter() === "All"){
 			for(var i = 0; i<self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
@@ -418,20 +363,73 @@ var ViewModel = function(){
 		}
 	});
 
+	//set the current type filter
 	self.filter = function (genre) {
 		self.currentFilter(genre);
 	};
 
+	//show directions legend
 	self.showDetailedDirections = function (){
 			self.showLegend(false);
 			self.showDirections(true);
 	};
 
+	//show the places legend
 	self.showFullLegend = function (){
 		self.showDirections(false);
 		self.showLegend(true);
+	};
+
+	//Get google directions from starting point to current item
+	self.getDirections = function (where, name, marker, rating, what, url){
+		//map = map;
+		directionsDisplay.setMap(map);
+		directionsDisplay.setOptions( { suppressMarkers: true } );
+		directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+
+		var start = view.listView()[0].position;
+		var end = where;
+		var request = {
+			origin:start,
+			destination:end,
+			travelMode: google.maps.TravelMode.WALKING
+		};
+
+		directionsService.route(request, function(result, status) {
+			if (status == google.maps.DirectionsStatus.OK) {
+				directionsDisplay.setDirections(result);
+				var distance = result.routes[0].legs[0].distance.text;
+				var duration = result.routes[0].legs[0].duration.text;
+				self.showInfo(name, marker, rating, what, url, distance, duration);
+			}
+		});
 	}
-}
+
+	//Show infowindow box for the current item
+	self.showInfo = function (where, marker, rating, what, url, distance, duration){
+		var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating
+		+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration
+		+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Show Directions!</button>';
+		//map = map;;
+		var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance+' about '+duration+'<br>';
+		//map = map;
+		//infowindow = new google.maps.InfoWindow;
+
+		infowindow.close();
+
+		if(url){
+			infowindow = new google.maps.InfoWindow({
+				content: contentStringYelp
+			});
+		}else{
+			infowindow = new google.maps.InfoWindow({
+				content: contentStringGoogle
+			});
+		}
+
+		infowindow.open(map, marker);
+	};
+};
 
 view = new ViewModel();
 

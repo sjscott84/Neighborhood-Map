@@ -29,7 +29,11 @@
 			</ul>
 		</div>
 
-		<div id="directionsPanel" data-bind="visible: showDirections"></div>
+		<div id="directionsPanel" data-bind="visible: showDirections">
+			<button type="button" class="btn btn-default" onclick="view.showFullLegend()">
+				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+			</button>
+		</div>
 	</div>
 
 	<script src="js/knockout-3.4.0.js"></script>
