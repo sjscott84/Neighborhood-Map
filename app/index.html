@@ -15,13 +15,13 @@
 	<div id="googleOverlay" class="controls">
 		<div data-bind="visible: showOptions" class="radio">
 			<label><input type="radio" name="whatToDo" value="culture">Culture</label><br>
-			<label><input type="radio" name="whatToDo" value="amusement">Amusement</label>
-			<label><input type="radio" name="whatToDo" value="outdoors">Outdoor Pursuits</label>
-			<label><input type="radio" name="whatToDo" value="animals">Animals</label>
-			<button type="button" class="btn btn-default" onclick="view.seePlaces()">Get Places to See!</button>
+			<label><input type="radio" name="whatToDo" value="amusement">Amusement</label><br>
+			<label><input type="radio" name="whatToDo" value="outdoors">Outdoor Pursuits</label><br>
+			<label><input type="radio" name="whatToDo" value="animals">Animals</label><br>
+			<button type="button" class="btn btn-default center-block" onclick="view.seePlaces()">Get Places to See!</button>
 		</div>
 		<div id="legend" data-bind="visible: showLegend">
-			<p data-bind="visible:showFilter">Filter by Type</p>
+			<h4 data-bind="visible:showFilter">Filter by Type</h4>
 			<select data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
 
 			<ul class="list-group" data-bind="foreach: filterView">

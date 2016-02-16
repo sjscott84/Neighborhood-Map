@@ -27,8 +27,18 @@ function initMap(){
 	view.findLocation();
 	view.addSearch();
 
-	map.controls[google.maps.ControlPosition.LEFT_TOP].push(
-		document.getElementById('googleOverlay'));
+	if ( $(window).width() > 480) {
+		map.controls[google.maps.ControlPosition.LEFT_TOP].push(
+			document.getElementById('googleOverlay'));
+	}else {
+		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(
+			document.getElementById('googleOverlay'));
+	}
+
+	google.maps.event.addListener(map, 'bounds_changed', function() {
+		//controlPosition();
+	});
+
 }
 
 var StartPlace = function(name, position, vicinity){

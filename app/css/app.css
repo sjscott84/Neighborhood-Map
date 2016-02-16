@@ -2,7 +2,7 @@ html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 
 #map {
@@ -22,6 +22,10 @@ html, body {
 	height: 32px;
 	outline: none;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.list-group {
+	padding-top: 10px;
 }
 
 #pac-input {
@@ -66,6 +70,14 @@ html, body {
 	margin-left: 12px;
 	padding-left: 10px;
 	padding-right: 10px;
-	overflow: scroll;
+	overflow-y: scroll;
+}
+
+@media (max-width: 480px){
+	#googleOverlay {
+		width: 90%;
+		height: 25%;
+		margin-bottom: 12px;
+	}
 }
 
