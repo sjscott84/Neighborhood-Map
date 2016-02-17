@@ -212,6 +212,8 @@ var ViewModel = function(){
 				}
 
 				map.fitBounds(bounds);
+				map.setZoom(15);
+				bounds = new google.maps.LatLngBounds();
 			});
 		});
 	};
