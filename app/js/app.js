@@ -97,7 +97,7 @@ var ViewModel = function(){
 	var cll;
 
 	self.showOptions = ko.observable(true);
-	self.showLegend = ko.observable(true);
+	self.showLegend = ko.observable(false);
 	self.showDirections = ko.observable(false);
 	self.listView = ko.observableArray([]);
 	self.currentPlace = ko.observable();
@@ -159,6 +159,10 @@ var ViewModel = function(){
 			});
 		}
 	};
+
+	self.deleteResults = function (){
+
+	}
 
 	//Search box, used to find starting point for plan if unable to use geolocation
 	self.addSearch = function (){
@@ -235,7 +239,7 @@ var ViewModel = function(){
 					break;
 				case 'amusement':
 					forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum'];
-					forSearchYelp = 'arcades,hauntedhouses,museums,amusementparks,carousels,gokarts,mini_golf';
+					forSearchYelp = 'museums,arcades,hauntedhouses,amusementparks,carousels,gokarts,mini_golf';
 					break;
 				case 'animals':
 					forSearchGoogle = ['aquarium', 'zoo'];
@@ -337,24 +341,23 @@ var ViewModel = function(){
 						i++;
 					}
 				}
+				view.showOptions(false);
+				view.showLegend(true);
+				view.showFilter(true);
 			}
 		}
 		if(view.listView().length === 1){
-			alert("There are no yelp results that match your search, please try a new starting point");
+			alert("There are no yelp results that match your search, try a new catagory");
 		}
 
+		//push unique dataTypes to dataType array for filtering purposes
 		for(var i = 1; i<view.listView().length; i++){
 			if(jQuery.inArray(view.listView()[i].what, view.dataType()) === -1){
 				view.dataType.push(view.listView()[i].what);
 			}
 		}
-
-		view.showOptions(false);
-		view.showFilter(true);
 	};
 
-
-	//TODO: Filter markers as well
 	self.filterView = ko.computed(function(){
 		//infowindow.close();
 		if(self.currentFilter() === "All"){
@@ -402,6 +405,26 @@ var ViewModel = function(){
 		self.showDirections(false);
 		self.showLegend(true);
 	};
+
+	self.showOptionsAgain = function (){
+		if (self.listView().length > 1){
+			for (var i = 1; i < self.listView().length; i++) {
+				self.listView()[i].marker.setMap(null);
+				directionsDisplay.setMap(null);
+				directionsDisplay.setPanel(null);
+			}
+			while(self.listView().length > 1){
+				self.listView().splice(1, 1);
+			}
+		}
+		labels[labelIndex=0];
+		yelpData = {};
+		googleData = [];
+		self.dataType(["All"]);
+		console.log(self.listView());
+		self.showLegend(false);
+		self.showOptions(true);
+	}
 
 	//Get google directions from starting point to current item
 	self.getDirections = function (where, name, marker, rating, what, url){

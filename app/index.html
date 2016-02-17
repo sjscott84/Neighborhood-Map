@@ -21,10 +21,15 @@
 			<button type="button" class="btn btn-default center-block" onclick="view.seePlaces()">Get Places to See!</button>
 		</div>
 		<div id="legend" data-bind="visible: showLegend">
-			<h4 data-bind="visible:showFilter">Filter by Type</h4>
+			<span data-bind="visible: showLegend">
+				<button type="button" class="btn btn-default" onclick="view.showOptionsAgain()">
+				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+				</button>
+				<h4 data-bind="visible:showLegend">Filter by Type</h4>
+			</span>
 			<select data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
 
-			<ul class="list-group" data-bind="foreach: filterView">
+			<ul class="list-group" data-bind="foreach: filterView, visible:showFilter">
 				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
 			</ul>
 		</div>

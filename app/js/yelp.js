@@ -19,9 +19,9 @@ function yelpHell (what, where, position, getGoogle){
 		category_filter: what,
 		location: where,
 		cll: position,
-		//limit: 20,
+		limit: 20,
 		offset: 20,
-		radius_filter: 10000, //1609,
+		radius_filter: 5000, //1609,
 		sort: 2,
 		oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
 		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',//added ! for error testing
