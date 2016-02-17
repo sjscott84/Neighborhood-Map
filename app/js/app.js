@@ -12,6 +12,7 @@ var yelpData;
 	var directionsDisplay;
 	var directionsService;
 	var markers = [];
+	var overlay = document.getElementById('googleOverlay');
 
 //Add google maps to screen with search box
 function initMap(){
@@ -28,16 +29,32 @@ function initMap(){
 	view.addSearch();
 
 	if ( $(window).width() > 480) {
-		map.controls[google.maps.ControlPosition.LEFT_TOP].push(
-			document.getElementById('googleOverlay'));
+		map.controls[google.maps.ControlPosition.LEFT_TOP].push(overlay);
 	}else {
-		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(
-			document.getElementById('googleOverlay'));
+		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(overlay);
 	}
 
-	google.maps.event.addListener(map, 'bounds_changed', function() {
-		//controlPosition();
-	});
+}
+
+var delay = (function(){
+	var timer = 0;
+	return function(callback, ms){
+		clearTimeout (timer);
+		timer = setTimeout(callback, ms);
+	};
+})();
+
+function changePositionOfLegend (){
+	var left = google.maps.ControlPosition.LEFT_TOP;
+	var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
+
+	if( $(window).width() < 480 && map.controls[left].length === 1){
+		map.controls[left].clear();
+		map.controls[bottom].push(overlay);
+	}else if( $(window).width() > 480 && map.controls[bottom].length === 1){
+		map.controls[bottom].clear();
+		map.controls[left].push(overlay);
+	}
 
 }
 
@@ -442,5 +459,14 @@ var ViewModel = function(){
 };
 
 view = new ViewModel();
+
+$(window).resize(function() {
+	delay(function(){
+		changePositionOfLegend();
+	}, 500);
+});
+
+
+//.addEventListener("resize", changePositionOfLegend);
 
 ko.applyBindings(view);
