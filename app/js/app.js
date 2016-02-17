@@ -36,14 +36,6 @@ function initMap(){
 
 }
 
-var delay = (function(){
-	var timer = 0;
-	return function(callback, ms){
-		clearTimeout (timer);
-		timer = setTimeout(callback, ms);
-	};
-})();
-
 function changePositionOfLegend (){
 	var left = google.maps.ControlPosition.LEFT_TOP;
 	var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
@@ -368,6 +360,7 @@ var ViewModel = function(){
 				self.listView()[i].marker.setMap(map);
 				directionsDisplay.setMap(null);
 				directionsDisplay.setPanel(null);
+				infowindow.close();
 			}
 			return self.listView();
 		}
@@ -375,6 +368,7 @@ var ViewModel = function(){
 			return self.listView();
 		} else {
 			return ko.utils.arrayFilter(self.listView(), function (prod) {
+				infowindow.close();
 				directionsDisplay.setMap(null);
 				directionsDisplay.setPanel(null);
 				for (var i = 1; i < self.listView().length; i++) {
@@ -460,13 +454,6 @@ var ViewModel = function(){
 
 view = new ViewModel();
 
-$(window).resize(function() {
-	delay(function(){
-		changePositionOfLegend();
-	}, 500);
-});
-
-
-//.addEventListener("resize", changePositionOfLegend);
+window.addEventListener("resize", changePositionOfLegend);
 
 ko.applyBindings(view);
