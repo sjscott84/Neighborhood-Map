@@ -20,15 +20,17 @@ function initMap(){
 	map = new google.maps.Map(document.getElementById('map'),{
 		center: startPoint,
 		zoom: 12,
+		mapTypeControl: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
 
 	infowindow = new google.maps.InfoWindow;
 
-	view.findLocation();
+	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
 
-	if ( $(window).width() > 480) {
+	//Adds legend to different part of screen depending on screen size
+	if ( $(window).width() > 600) {
 		map.controls[google.maps.ControlPosition.LEFT_TOP].push(overlay);
 	}else {
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(overlay);
@@ -36,20 +38,24 @@ function initMap(){
 
 }
 
+//Moves legend on screen resize
 function changePositionOfLegend (){
 	var left = google.maps.ControlPosition.LEFT_TOP;
 	var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
+	var rightBottom = google.maps.ControlPosition.BOTTOM_RIGHT
+	var rightTop = google.maps.ControlPosition.RIGHT_TOP
 
-	if( $(window).width() < 480 && map.controls[left].length === 1){
+	if( $(window).width() < 600 && map.controls[left].length === 1){
 		map.controls[left].clear();
 		map.controls[bottom].push(overlay);
-	}else if( $(window).width() > 480 && map.controls[bottom].length === 1){
+	}else if( $(window).width() > 600 && map.controls[bottom].length === 1){
 		map.controls[bottom].clear();
 		map.controls[left].push(overlay);
 	}
 
 }
 
+//The starting position for any directions
 var StartPlace = function(name, position, vicinity){
 	this.map = map;
 	this.name = name;
@@ -78,7 +84,8 @@ var Place = function(name, position, rating, what, url){
 			map: map,
 			title: name,
 			position: this.position,
-			label: labels[labelIndex++ % labels.length]
+			label: labels[labelIndex++ % labels.length],
+			zoomOnClick: false
 		});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
@@ -105,6 +112,7 @@ var ViewModel = function(){
 	self.showFilter = ko.observable(false);
 	self.currentFilter = ko.observable();
 
+	//this functionality turned off to meet project requirement for search capabilities
 	//Use W3C Geolocation to find users current position
 	self.findLocation = function(){
 		var browserSupportFlag =  new Boolean();
@@ -149,7 +157,6 @@ var ViewModel = function(){
 				if (status === google.maps.GeocoderStatus.OK) {
 					if (results[1]) {
 						vicinity = results[1].formatted_address;
-						//console.log(vicinity);
 					} else {
 					window.alert('No results found');
 					}
@@ -159,10 +166,6 @@ var ViewModel = function(){
 			});
 		}
 	};
-
-	self.deleteResults = function (){
-
-	}
 
 	//Search box, used to find starting point for plan if unable to use geolocation
 	self.addSearch = function (){
@@ -177,8 +180,12 @@ var ViewModel = function(){
 			searchBox.setBounds(map.getBounds());
 		});
 
-		// Listen for the event fired when the user selects a prediction and retrieve
-		// more details for that place.
+		directionsDisplay = new google.maps.DirectionsRenderer();
+		directionsService = new google.maps.DirectionsService();
+
+		// Listen for the event fired when the user selects a prediction,
+		// removes any existing search history and
+		// retrieves more details for that place.
 		searchBox.addListener('places_changed', function() {
 			places = searchBox.getPlaces();
 			if (places.length === 0) {
@@ -216,7 +223,7 @@ var ViewModel = function(){
 				}
 
 				map.fitBounds(bounds);
-				map.setZoom(15);
+				map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
 			});
 		});
@@ -224,32 +231,34 @@ var ViewModel = function(){
 
 	//Defines types for the findThings function to search wether results come from yelp api or google places api
 	self.seePlaces = function (){
-		var forSearchYelp;
-		var forSearchGoogle = [];
-		$('input[name="whatToDo"]:checked').each(function(){
-			var input = this.value;
-			switch (input) {
-				case 'outdoors':
-					forSearchGoogle = ['park', 'zoo'];
-					forSearchYelp = 'parks,playgrounds,gardens,farms,observatories,beaches,hiking,horsebackriding,skatingrinks,swimmingpools,waterparks';
-					break;
-				case 'culture':
-					forSearchGoogle = ['art_gallery', 'library', 'museum'];
-					forSearchYelp = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks,observatories';
-					break;
-				case 'amusement':
-					forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum'];
-					forSearchYelp = 'museums,arcades,hauntedhouses,amusementparks,carousels,gokarts,mini_golf';
-					break;
-				case 'animals':
-					forSearchGoogle = ['aquarium', 'zoo'];
-					forSearchYelp = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos,skatingrinks';
-					break;
-			}
-				//forSearch = forSearch.concat(input);
-		});
-		//search yelp api
-		yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle);
+		if(!self.listView()[0]){
+			alert("Please enter a starting location");
+		}else{
+			var forSearchYelp;
+			var forSearchGoogle = [];
+			$('input[name="whatToDo"]:checked').each(function(){
+				var input = this.value;
+				switch (input) {
+					case 'outdoors':
+						forSearchGoogle = ['park', 'zoo'];
+						forSearchYelp = 'parks,playgrounds,gardens,farms,observatories,beaches,hiking,horsebackriding,skatingrinks,swimmingpools,waterparks';
+						break;
+					case 'culture':
+						forSearchGoogle = ['art_gallery', 'library', 'museum'];
+						forSearchYelp = 'galleries,culturalcenter,museums,planetarium,wineries,landmarks,observatories';
+						break;
+					case 'amusement':
+						forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum'];
+						forSearchYelp = 'museums,arcades,hauntedhouses,amusementparks,carousels,gokarts,mini_golf';
+						break;
+					case 'animals':
+						forSearchGoogle = ['aquarium', 'zoo'];
+						forSearchYelp = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos,skatingrinks';
+						break;
+				}
+				yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle);
+			});
+		}
 	};
 
 	//Add a start place to an observable array
@@ -324,28 +333,31 @@ var ViewModel = function(){
 		service.nearbySearch(seachNearByQuery, callback);
 	}
 
-	//Sort through yelp data and display
+	//Sort through yelp or google data and display
 	self.displayPlaces = function (){
+		//adds google results to view.listView() if no yelp results
 		if(yelpData === undefined || jQuery.isEmptyObject(yelpData)){
 			for(var j = 0; j<googleData.length; j++){
 				view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
 			}
 		}else{
+			//adds yelp info to view.listView if rating is over 3.5 and is open
 			var yelp = yelpData.businesses;
 			for(var i = 0; i<yelp.length; i++){
 				if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
 					try{
 						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
 						view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
+						view.showOptions(false);
+						view.showLegend(true);
+						view.showFilter(true);
 					}catch(e){
 						i++;
 					}
 				}
-				view.showOptions(false);
-				view.showLegend(true);
-				view.showFilter(true);
 			}
 		}
+		//if no yelp results match search catagory return error message
 		if(view.listView().length === 1){
 			alert("There are no yelp results that match your search, try a new catagory");
 		}
@@ -358,8 +370,8 @@ var ViewModel = function(){
 		}
 	};
 
+	//Filter results by catagory
 	self.filterView = ko.computed(function(){
-		//infowindow.close();
 		if(self.currentFilter() === "All"){
 			for(var i = 0; i<self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
@@ -387,6 +399,9 @@ var ViewModel = function(){
 				return prod.what == self.currentFilter();
 			});
 		}
+		google.maps.event.addListener(self.filterView, 'click', function() {
+			map.setCenter(self.listView()[0].marker.position);
+		});
 	});
 
 	//set the current type filter
@@ -406,6 +421,7 @@ var ViewModel = function(){
 		self.showLegend(true);
 	};
 
+	//Choose a new catagory to search by pressing back button
 	self.showOptionsAgain = function (){
 		if (self.listView().length > 1){
 			for (var i = 1; i < self.listView().length; i++) {

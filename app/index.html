@@ -10,7 +10,7 @@
 <body>
 
 	<div id="map"></div>
-	<input id="pac-input" class="controls" type="text" placeholder="Starting Point">
+	<input id="pac-input" class="controls" type="text" placeholder="Enter Starting Location Here">
 
 	<div id="googleOverlay" class="controls">
 		<div data-bind="visible: showOptions" class="radio">
@@ -22,12 +22,13 @@
 		</div>
 		<div id="legend" data-bind="visible: showLegend">
 			<span data-bind="visible: showLegend">
-				<button type="button" class="btn btn-default" onclick="view.showOptionsAgain()">
+				<button id="back-button" type="button" class="btn btn-default btn-xs" onclick="view.showOptionsAgain()">
 				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
 				</button>
-				<h4 data-bind="visible:showLegend">Filter by Type</h4>
+				<h4 id="filter-title" data-bind="visible:showLegend">Filter by Type:</h4>
 			</span>
-			<select data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
+
+			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
 
 			<ul class="list-group" data-bind="foreach: filterView, visible:showFilter">
 				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
@@ -35,7 +36,7 @@
 		</div>
 
 		<div id="directionsPanel" data-bind="visible: showDirections">
-			<button type="button" class="btn btn-default" onclick="view.showFullLegend()">
+			<button id="back-button-directions" type="button" class="btn btn-default btn-xs" data-bind="visible: showDirections" onclick="view.showFullLegend()">
 				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
 			</button>
 		</div>
