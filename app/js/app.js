@@ -249,11 +249,11 @@ var ViewModel = function(){
 						break;
 					case 'amusement':
 						forSearchGoogle = ['amusement_park', 'bowling_alley', 'museum'];
-						forSearchYelp = 'museums,arcades,hauntedhouses,amusementparks,carousels,gokarts,mini_golf';
+						forSearchYelp = 'museums,arcades,hauntedhouses,amusementparks,carousels,gokarts,mini_golf,skatingrinks';
 						break;
 					case 'animals':
 						forSearchGoogle = ['aquarium', 'zoo'];
-						forSearchYelp = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos,skatingrinks';
+						forSearchYelp = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos';
 						break;
 				}
 				yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle);
@@ -348,15 +348,19 @@ var ViewModel = function(){
 					try{
 						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
 						view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
-						view.showOptions(false);
-						view.showLegend(true);
-						view.showFilter(true);
+						//view.showOptions(false);
+						//view.showLegend(true);
+						//view.showFilter(true);
 					}catch(e){
 						i++;
 					}
 				}
 			}
 		}
+		view.showOptions(false);
+		view.showLegend(true);
+		view.showFilter(true);
+
 		//if no yelp results match search catagory return error message
 		if(view.listView().length === 1){
 			alert("There are no yelp results that match your search, try a new catagory");
@@ -473,7 +477,8 @@ var ViewModel = function(){
 		+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration
 		+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Show Directions!</button>';
 		//map = map;;
-		var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance+' about '+duration+'<br>';
+		var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance
+		+' about '+duration+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Show Directions!</button>';
 		//map = map;
 		//infowindow = new google.maps.InfoWindow;
 
