@@ -102,13 +102,21 @@ html, body {
 	}
 
 	#filter {
-		float: left;
+		display:inline-block;
 		margin-top: 10px;
 		margin-left: 20px;
 	}
 
 	.list-group {
-		padding-top: 40px;
+		padding-top: 10px;
 	}
 }
+
+@media (max-width: 445px){
+	#filter {
+		margin-left: 0px;
+		margin-top: 5px;
+	}
+}
+
 

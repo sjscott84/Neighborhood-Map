@@ -27,7 +27,6 @@
 				</button>
 				<h4 id="filter-title" data-bind="visible:showLegend">Filter by Type:</h4>
 			</span>
-
 			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
 
 			<ul class="list-group" data-bind="foreach: filterView, visible:showFilter">

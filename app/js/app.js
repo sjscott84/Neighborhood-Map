@@ -64,11 +64,11 @@ function saveInfo (){
 
 	localStorage.setItem("results", JSON.stringify(infoToSave));
 	//localStorage.setItem("dataTypes", JSON.stringify(view.dataType()));
-	//view.listView([]);
-	getInfo();
+	//getInfo();
 }
 
 function getInfo (){
+	view.listView([]);
 	var resultsFromLocalStorage = localStorage.getItem("results");
 	var resultsToUse = JSON.parse(resultsFromLocalStorage);
 	labels[labelIndex=0];
