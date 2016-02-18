@@ -2,21 +2,18 @@
 var map;
 var view;
 var startPoint = {lat:37.773972, lng: -122.431297};
-var infowindow;	
+var infowindow;
 var yelpData;
-	var googleData = [];
-	var searchBox;
-	var places;
-	var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
-	var labelIndex = 0;
-	var directionsDisplay;
-	var directionsService;
-	var markers = [];
-	var overlay = document.getElementById('googleOverlay');
-		var vicinity;
-	var cll;
+var googleData = [];
+var overlay = document.getElementById('googleOverlay');
+var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
+var labelIndex = 0;
+var vicinity;
+var cll;
 
-//Add google maps to screen with search box
+/**
+ * Add google maps to screen with search box
+*/
 function initMap(){
 
 	map = new google.maps.Map(document.getElementById('map'),{
@@ -38,10 +35,8 @@ function initMap(){
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(overlay);
 	}
 
-	//localStorage.clear();
-
-	if (localStorage.getItem("results") != null) {
-		getInfo();
+	if (localStorage.getItem("results") !== null) {
+		view.getInfo();
 		vicinity = view.listView()[0].vicinity;
 		cll = view.listView()[0].position.lat+','+view.listView()[0].position.lng;
 		map.setZoom(14);
@@ -51,66 +46,17 @@ function initMap(){
 
 }
 
-function saveInfo (){
-
-	var infoToSave = [];
-
-	infoToSave.push({name: view.listView()[0].name, position: view.listView()[0].position, vicinity: view.listView()[0].vicinity});
-
-	for(var i = 1; i<view.listView().length; i++){
-		infoToSave.push({name: view.listView()[i].name, position: view.listView()[i].position, rating: view.listView()[i].rating,
-		what: view.listView()[i].what, url: view.listView()[i].url});
-	}
-
-	localStorage.setItem("results", JSON.stringify(infoToSave));
-	//localStorage.setItem("dataTypes", JSON.stringify(view.dataType()));
-	//getInfo();
-}
-
-function getInfo (){
-	view.listView([]);
-	var resultsFromLocalStorage = localStorage.getItem("results");
-	var resultsToUse = JSON.parse(resultsFromLocalStorage);
-	labels[labelIndex=0];
-
-	view.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);
-
-	for(var i = 1; i<resultsToUse.length; i++){
-		view.addPlace(resultsToUse[i].name, resultsToUse[i].position, resultsToUse[i].rating, resultsToUse[i].what, resultsToUse[i].url);
-	}
-
-	//push unique dataTypes to dataType array for filtering purposes
-	for(var i = 1; i<resultsToUse.length; i++){
-		if(jQuery.inArray(resultsToUse[i].what, view.dataType()) === -1){
-			view.dataType.push(resultsToUse[i].what);
-		}
-	}
-}
-
-//Moves legend on screen resize
-function changePositionOfLegend (){
-	var left = google.maps.ControlPosition.LEFT_TOP;
-	var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
-	var rightBottom = google.maps.ControlPosition.BOTTOM_RIGHT
-	var rightTop = google.maps.ControlPosition.RIGHT_TOP
-
-	if( $(window).width() < 600 && map.controls[left].length === 1){
-		map.controls[left].clear();
-		map.controls[bottom].push(overlay);
-	}else if( $(window).width() > 600 && map.controls[bottom].length === 1){
-		map.controls[bottom].clear();
-		map.controls[left].push(overlay);
-	}
-
-}
-
-//The starting position for any directions
+/**
+ * The starting position for any directions
+ * @param {string} name - The name of the starting place
+ * @param {object} position - The latitude and longitude of the starting place
+ * @param {string} vicinity - A formatted address for the starting place
+*/
 var StartPlace = function(name, position, vicinity){
 	this.map = map;
 	this.name = name;
 	this.position = position;
 	this.vicinity = vicinity;
-	//this.icon = icon;
 	this.marker = new google.maps.Marker({
 			map: map,
 			title: name,
@@ -118,10 +64,16 @@ var StartPlace = function(name, position, vicinity){
 			position: this.position,
 		});
 	this.listName = "A - "+name;
-
-	//markers.push(this.marker);
 };
 
+/**
+ * The place object for the results returned from yelp or google
+ * @param {string} name - The name of the place
+ * @param {object} position - The latitude and longitude of the place
+ * @param {number} rating - The rating of the place
+ * @param {string} what - The catagory of the place e.g "Art Gallery"
+ * @param {url} url - The URL to the yelp page of place (only supplied when info comes from yelp api and not google api)
+ */
 var Place = function(name, position, rating, what, url){
 	this.map = map;
 	this.name = name;
@@ -143,14 +95,18 @@ var Place = function(name, position, rating, what, url){
 	});
 
 	this.listName = this.marker.label+" - "+name;
-
-	//markers.push(this.marker);
 };
 
+/**
+ * View model for website
+ */
 var ViewModel = function(){
 	var self = this;
-	//var vicinity;
-	//var cll;
+	var searchBox;
+	var places;
+	var labelIndex = 0;
+	var directionsDisplay;
+	var directionsService;
 
 	self.showOptions = ko.observable(true);
 	self.showLegend = ko.observable(false);
@@ -162,7 +118,9 @@ var ViewModel = function(){
 	self.currentFilter = ko.observable();
 
 	//this functionality turned off to meet project requirement for search capabilities
-	//Use W3C Geolocation to find users current position
+	/**
+	 * Use W3C Geolocation to find users current position
+	 */
 	self.findLocation = function(){
 		var browserSupportFlag =  new Boolean();
 		var initialLocation;
@@ -179,17 +137,17 @@ var ViewModel = function(){
 				initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
 				map.setCenter(initialLocation);
 				geocodeLatLng(initialLocation);
-				view.addStartPlace("Starting Point", initialLocation, vicinity);
+				self.addStartPlace("Starting Point", initialLocation, vicinity);
 			}, function() {
 				handleNoGeolocation(browserSupportFlag);
 			});
 		}
-		// Browser doesn't support Geolocation
+		// If browser doesn't support Geolocation
 		else {
 			browserSupportFlag = false;
 			handleNoGeolocation(browserSupportFlag);
 		}
-
+		// Handle erros
 		function handleNoGeolocation(errorFlag) {
 			if (errorFlag === true) {
 				alert("Geolocation service failed, enter your starting location in the search field in the map");
@@ -216,7 +174,9 @@ var ViewModel = function(){
 		}
 	};
 
-	//Search box, used to find starting point for plan if unable to use geolocation
+	/**
+	 * Search box, used to find starting point for place searches if unable to use geolocation
+	 */
 	self.addSearch = function (){
 		// Create the search box and link it to the UI element.
 		var input = document.getElementById('pac-input');
@@ -248,7 +208,6 @@ var ViewModel = function(){
 				directionsDisplay.setPanel(null);
 				labels[labelIndex=0];
 				self.showCatagories();
-				//markers = [];
 				self.listView([]);
 				yelpData = {};
 				googleData = [];
@@ -257,7 +216,6 @@ var ViewModel = function(){
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
-				//vicinity = place.vicinity;
 				vicinity = place.formatted_address;
 				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
 
@@ -277,7 +235,10 @@ var ViewModel = function(){
 		});
 	};
 
-	//Defines types for the findThings function to search wether results come from yelp api or google places api
+	/**
+	 * Defines types for the findThings function to search weather results come from yelp api or google places api
+	 * Input is the catagories radio
+	 */
 	self.seePlaces = function (){
 		if(!self.listView()[0]){
 			alert("Please enter a starting location");
@@ -309,46 +270,50 @@ var ViewModel = function(){
 		}
 	};
 
-	//Add a start place to an observable array
+	/**
+	 * Add a start place to an observable array
+	 * @param {string} name - The name of the starting place
+	 * @param {object} position - The latitude and longitude of the starting place
+	 * @param {string} vicinity - A formatted address for the starting place
+	 */
 	self.addStartPlace = function (name, position, vicinity){
 		self.listView.push(new StartPlace(name, position, vicinity));
 	};
 
-	//Add a place to an observable array
+	/**
+	 * Add a place to an observable array
+	 * @param {string} name - The name of the place
+	 * @param {object} position - The latitude and longitude of the place
+	 * @param {number} rating - The rating of the place
+	 * @param {string} what - The catagory of the place e.g "Art Gallery"
+	 * @param {url} url - The URL to the yelp page of place (only supplied when info comes from yelp api and not google api)
+	 */
 	self.addPlace = function (name, position, rating, what, url){
 		self.listView.push(new Place(name, position, rating, what, url));
 	};
 
-	//Sets the current place to clicked list item
+	/**
+	 * Sets the current place to clicked list item
+	 * @param {object} clickedPlace - The item from the self.filterView list that was clicked
+	 */
 	self.setPlace = function(clickedPlace){
 		self.currentPlace(clickedPlace);
 		self.showFullLegend();
 		self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
 	};
 
-	//Search google places api by type if yelp api fails
+	/**
+	 * Search google places api by type if yelp api fails
+	 * @param {array} what - An array of catagories for google to search for
+	 */
 	self.findThings = function (what){
 
 		var service = new google.maps.places.PlacesService(map);
 
-		//Gets google place details for specific ID
-		function placeDetailCallback(placeDetail, status){
-			if (status == google.maps.places.PlacesServiceStatus.OK) {
-				var placeURL = { 
-					url: placeDetail.website
-				};
-				googleData.push(placeURL);
-			} else {
-				console.log("error");
-			}
-		}
-
-		//Gets a list of google places for a starting point
+		//Gets a list of google places from a starting point
 		function callback(results, status){
 			if (status === google.maps.places.PlacesServiceStatus.OK) {
 				for (var i = 0; i < results.length; i++) {
-					//var yelp = yelpData.businesses; 
-					//console.log(results[i]);
 					var place = results[i];
 					if(place.rating >= 3){
 						
@@ -357,13 +322,11 @@ var ViewModel = function(){
 							position: place.geometry.location, 
 							type: place.types[0], 
 							rating: place.rating, 
-							//url: placeDetail.website
 						};
 						googleData.push(thePlace);
-						//service.getDetails({placeId: place.place_id}, placeDetailCallback);
 					}
 				}
-
+				//Return error message if no results
 				if(googleData.length === 0){
 					alert("There are no google results that match your search, please try a new starting point");
 				}else{
@@ -373,29 +336,31 @@ var ViewModel = function(){
 		}
 
 		var seachNearByQuery = {
-			location: view.listView()[0].position,
+			location: self.listView()[0].position,
 			//radius: '500',
 			types: what,
 			rankBy: google.maps.places.RankBy.DISTANCE
 		};
 		service.nearbySearch(seachNearByQuery, callback);
-	}
+	};
 
-	//Sort through yelp or google data and display
+	/**
+	 * Sort through yelp or google data and display based on various catagories
+	 */
 	self.displayPlaces = function (){
 		//adds google results to view.listView() if no yelp results
 		if(yelpData === undefined || jQuery.isEmptyObject(yelpData)){
 			for(var j = 0; j<googleData.length; j++){
-				view.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
+				self.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
 			}
 		}else{
-			//adds yelp info to view.listView if rating is over 3.5 and is open
+			//adds yelp info to view.listView() if rating is over 3.5 and is open
 			var yelp = yelpData.businesses;
 			for(var i = 0; i<yelp.length; i++){
 				if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
 					try{
 						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
-						view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
+						self.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
 					}catch(e){
 						i++;
 					}
@@ -403,25 +368,21 @@ var ViewModel = function(){
 			}
 		}
 
-		//if no yelp results match search catagory return error message
-		if(view.listView().length === 1){
+		//if no yelp results match search catagory return error message else save results to local storage
+		if(self.listView().length === 1){
 			alert("There are no results that match your search, try a new catagory");
 		}else{
 			self.showResults();
 			localStorage.clear();
-			saveInfo();
+			self.saveInfo();
 		}
 
-		//push unique dataTypes to dataType array for filtering purposes
-		for(var i = 1; i<view.listView().length; i++){
-			if(jQuery.inArray(view.listView()[i].what, view.dataType()) === -1){
-				view.dataType.push(view.listView()[i].what);
-			}
-		}
-
+		self.setDataTypeArray(self.listView());
 	};
 
-	//Filter results by catagory
+	/**
+	 * Filter results by catagory
+	 */
 	self.filterView = ko.computed(function(){
 		if(self.currentFilter() === "All"){
 			for(var i = 0; i<self.listView().length; i++){
@@ -443,7 +404,6 @@ var ViewModel = function(){
 					if(self.listView()[i].what !== self.currentFilter()){
 						self.listView()[i].marker.setMap(null);
 					}else{
-						//(self.listView()[i].what === self.currentFilter())
 						self.listView()[i].marker.setMap(map);
 					}
 				}
@@ -455,38 +415,51 @@ var ViewModel = function(){
 		});
 	});
 
-	//set the current type filter
+	/**
+	 * set the current type filter
+	 * @param {string} genre - Catagory to filter on
+	 */
 	self.filter = function (genre) {
 		self.currentFilter(genre);
 	};
 
-	//show directions legend
+	/**
+	 * show directions legend
+	 */
 	self.showDetailedDirections = function (){
 			self.showLegend(false);
 			self.showDirections(true);
 	};
 
-	//show the places legend
+	/**
+	 * show the places legend
+	 */
 	self.showFullLegend = function (){
 		self.showDirections(false);
 		self.showLegend(true);
 	};
 
-	//show catagory options
+	/**
+	 * show catagory options
+	 */
 	self.showCatagories = function (){
 		self.showOptions(true);
 		self.showLegend(false);
 		self.showFilter(false);
 	};
 
-	//show results
+	/**
+	 * show results
+	 */
 	self.showResults = function (){
 		self.showOptions(false);
 		self.showLegend(true);
 		self.showFilter(true);
 	};
 
-	//Choose a new catagory to search by pressing back button
+	/**
+	 * Choose a new catagory to search by pressing back button from results
+	 */
 	self.showOptionsAgain = function (){
 		if (self.listView().length > 1){
 			for (var i = 1; i < self.listView().length; i++) {
@@ -504,16 +477,23 @@ var ViewModel = function(){
 		self.dataType(["All"]);
 		console.log(self.listView());
 		self.showCatagories();
-	}
+	};
 
-	//Get google directions from starting point to current item
+	/**
+	 * Get google walking directions from starting point to current item
+	 * @param {object} where - object containing latitude and longitude of place to get directions too
+	 * @param {string} name - name of place
+	 * @param {object} marker - the google marker of the place to get directions to
+	 * @param {number} rating - rating of place to get directions to
+	 * @param {string} what - catagory of place to get directions to
+	 * @param {string} url - URL to yelp reviews (only provided when results come from yelp not google)
+	 */
 	self.getDirections = function (where, name, marker, rating, what, url){
-		//map = map;
 		directionsDisplay.setMap(map);
 		directionsDisplay.setOptions( { suppressMarkers: true } );
 		directionsDisplay.setPanel(document.getElementById("directionsPanel"));
 
-		var start = view.listView()[0].position;
+		var start = self.listView()[0].position;
 		var end = where;
 		var request = {
 			origin:start,
@@ -529,18 +509,24 @@ var ViewModel = function(){
 				self.showInfo(name, marker, rating, what, url, distance, duration);
 			}
 		});
-	}
+	};
 
-	//Show infowindow box for the current item
+	/**
+	 * Show infowindow box for the current item
+	 * @param {object} where - object containing latitude and longitude of place to get directions too
+	 * @param {object} marker - the google marker of the place to get directions to
+	 * @param {number} rating - rating of place to get directions to
+	 * @param {string} what - catagory of place to get directions to
+	 * @param {string} url - URL to yelp reviews (only provided when results come from yelp not google)
+	 * @param {string} distance - distance from starting point to current item from google
+	 * @param {string} duration - how long it will take to get from starting point to current item from google
+	 */
 	self.showInfo = function (where, marker, rating, what, url, distance, duration){
 		var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating
 		+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration
 		+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Show Directions!</button>';
-		//map = map;;
 		var contentStringGoogle = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Google Rating: '+rating+'<br>Walk Time: '+distance
 		+' about '+duration+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Show Directions!</button>';
-		//map = map;
-		//infowindow = new google.maps.InfoWindow;
 
 		infowindow.close();
 
@@ -556,10 +542,74 @@ var ViewModel = function(){
 
 		infowindow.open(map, marker);
 	};
+
+	/**
+	 * Save the current starting place and place results to local storage
+	 */
+	self.saveInfo = function (){
+		var infoToSave = [];
+
+		infoToSave.push({name: self.listView()[0].name, position: self.listView()[0].position, vicinity: self.listView()[0].vicinity});
+
+		for(var i = 1; i<self.listView().length; i++){
+			infoToSave.push({name: self.listView()[i].name, position: self.listView()[i].position, rating: self.listView()[i].rating,
+			what: self.listView()[i].what, url: self.listView()[i].url});
+		}
+
+		localStorage.setItem("results", JSON.stringify(infoToSave));
+	};
+
+	/**
+	 * Retrieve infomation from local storage
+	 */
+	self.getInfo = function (){
+		self.listView([]);
+		var resultsFromLocalStorage = localStorage.getItem("results");
+		var resultsToUse = JSON.parse(resultsFromLocalStorage);
+		labels[labelIndex=0];
+
+		self.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);
+
+		for(var i = 1; i<resultsToUse.length; i++){
+			self.addPlace(resultsToUse[i].name, resultsToUse[i].position, resultsToUse[i].rating, resultsToUse[i].what, resultsToUse[i].url);
+		}
+
+		self.setDataTypeArray(resultsToUse);
+	};
+
+	/**
+	 * Creates the dataType array to filter results on
+	 * @param {array} what - array to get catagory types from
+	 */
+	self.setDataTypeArray = function (what){
+		for(var i = 1; i<what.length; i++){
+			if(jQuery.inArray(what[i].what, self.dataType()) === -1){
+				self.dataType.push(what[i].what);
+			}
+		}
+	};
+
+	/**
+	 * Moves legend on screen resize to make site responsive
+	 */
+	self.changePositionOfLegend = function (){
+		var left = google.maps.ControlPosition.LEFT_TOP;
+		var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
+
+		if( $(window).width() < 600 && map.controls[left].length === 1){
+			map.controls[left].clear();
+			map.controls[bottom].push(overlay);
+		}else if( $(window).width() > 600 && map.controls[bottom].length === 1){
+			map.controls[bottom].clear();
+			map.controls[left].push(overlay);
+		}
+
+	};
+
 };
 
 view = new ViewModel();
 
-window.addEventListener("resize", changePositionOfLegend);
+window.addEventListener("resize", view.changePositionOfLegend);
 
 ko.applyBindings(view);
