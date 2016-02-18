@@ -13,6 +13,8 @@ var yelpData;
 	var directionsService;
 	var markers = [];
 	var overlay = document.getElementById('googleOverlay');
+		var vicinity;
+	var cll;
 
 //Add google maps to screen with search box
 function initMap(){
@@ -36,6 +38,53 @@ function initMap(){
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(overlay);
 	}
 
+	//localStorage.clear();
+
+	if (localStorage.getItem("results") != null) {
+		getInfo();
+		vicinity = view.listView()[0].vicinity;
+		cll = view.listView()[0].position.lat+','+view.listView()[0].position.lng;
+		map.setZoom(14);
+		map.setCenter(view.listView()[0].position);
+		view.showResults();
+	}
+
+}
+
+function saveInfo (){
+
+	var infoToSave = [];
+
+	infoToSave.push({name: view.listView()[0].name, position: view.listView()[0].position, vicinity: view.listView()[0].vicinity});
+
+	for(var i = 1; i<view.listView().length; i++){
+		infoToSave.push({name: view.listView()[i].name, position: view.listView()[i].position, rating: view.listView()[i].rating,
+		what: view.listView()[i].what, url: view.listView()[i].url});
+	}
+
+	localStorage.setItem("results", JSON.stringify(infoToSave));
+	//localStorage.setItem("dataTypes", JSON.stringify(view.dataType()));
+	//view.listView([]);
+	getInfo();
+}
+
+function getInfo (){
+	var resultsFromLocalStorage = localStorage.getItem("results");
+	var resultsToUse = JSON.parse(resultsFromLocalStorage);
+	labels[labelIndex=0];
+
+	view.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);
+
+	for(var i = 1; i<resultsToUse.length; i++){
+		view.addPlace(resultsToUse[i].name, resultsToUse[i].position, resultsToUse[i].rating, resultsToUse[i].what, resultsToUse[i].url);
+	}
+
+	//push unique dataTypes to dataType array for filtering purposes
+	for(var i = 1; i<resultsToUse.length; i++){
+		if(jQuery.inArray(resultsToUse[i].what, view.dataType()) === -1){
+			view.dataType.push(resultsToUse[i].what);
+		}
+	}
 }
 
 //Moves legend on screen resize
@@ -100,8 +149,8 @@ var Place = function(name, position, rating, what, url){
 
 var ViewModel = function(){
 	var self = this;
-	var vicinity;
-	var cll;
+	//var vicinity;
+	//var cll;
 
 	self.showOptions = ko.observable(true);
 	self.showLegend = ko.observable(false);
@@ -191,21 +240,20 @@ var ViewModel = function(){
 			if (places.length === 0) {
 				return;
 			}
-			if (self.listView().length > 0){
+			//if (self.listView().length > 0){
 				for (var i = 0; i < self.listView().length; i++) {
 					self.listView()[i].marker.setMap(null);
-					directionsDisplay.setMap(null);
-					directionsDisplay.setPanel(null);
-					labels[labelIndex=0];
 				}
-				view.showOptions(true);
-				view.showFilter(false);
+				directionsDisplay.setMap(null);
+				directionsDisplay.setPanel(null);
+				labels[labelIndex=0];
+				self.showCatagories();
 				//markers = [];
 				self.listView([]);
 				yelpData = {};
 				googleData = [];
 				self.dataType(["All"]);
-			}
+			//}
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
@@ -348,22 +396,20 @@ var ViewModel = function(){
 					try{
 						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
 						view.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
-						//view.showOptions(false);
-						//view.showLegend(true);
-						//view.showFilter(true);
 					}catch(e){
 						i++;
 					}
 				}
 			}
 		}
-		view.showOptions(false);
-		view.showLegend(true);
-		view.showFilter(true);
 
 		//if no yelp results match search catagory return error message
 		if(view.listView().length === 1){
-			alert("There are no yelp results that match your search, try a new catagory");
+			alert("There are no results that match your search, try a new catagory");
+		}else{
+			self.showResults();
+			localStorage.clear();
+			saveInfo();
 		}
 
 		//push unique dataTypes to dataType array for filtering purposes
@@ -372,6 +418,7 @@ var ViewModel = function(){
 				view.dataType.push(view.listView()[i].what);
 			}
 		}
+
 	};
 
 	//Filter results by catagory
@@ -425,6 +472,20 @@ var ViewModel = function(){
 		self.showLegend(true);
 	};
 
+	//show catagory options
+	self.showCatagories = function (){
+		self.showOptions(true);
+		self.showLegend(false);
+		self.showFilter(false);
+	};
+
+	//show results
+	self.showResults = function (){
+		self.showOptions(false);
+		self.showLegend(true);
+		self.showFilter(true);
+	};
+
 	//Choose a new catagory to search by pressing back button
 	self.showOptionsAgain = function (){
 		if (self.listView().length > 1){
@@ -442,8 +503,7 @@ var ViewModel = function(){
 		googleData = [];
 		self.dataType(["All"]);
 		console.log(self.listView());
-		self.showLegend(false);
-		self.showOptions(true);
+		self.showCatagories();
 	}
 
 	//Get google directions from starting point to current item
