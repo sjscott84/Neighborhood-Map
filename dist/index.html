@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Find Something To Do</title>
+	<link rel="stylesheet" href="css/styles.min.css">
+</head>
+
+<body>
+
+	<div id="map"></div>
+	<input id="pac-input" class="controls" type="text" placeholder="Enter Starting Location Here">
+
+	<div id="googleOverlay" class="controls">
+		<div data-bind="visible: showOptions" class="radio">
+			<label><input type="radio" name="whatToDo" value="culture">Culture</label><br>
+			<label><input type="radio" name="whatToDo" value="amusement">Amusement</label><br>
+			<label><input type="radio" name="whatToDo" value="outdoors">Outdoor Pursuits</label><br>
+			<label><input type="radio" name="whatToDo" value="animals">Animals</label><br>
+			<button type="button" class="btn btn-default center-block" onclick="view.seePlaces()">Get Places to See!</button>
+		</div>
+		<div id="legend" data-bind="visible: showLegend">
+			<span data-bind="visible: showLegend">
+				<button id="back-button" type="button" class="btn btn-default btn-xs" onclick="view.showOptionsAgain()">
+				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+				</button>
+				<h4 id="filter-title" data-bind="visible:showLegend">Filter by Type:</h4>
+			</span>
+			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
+
+			<ul class="list-group" data-bind="foreach: filterView, visible:showFilter">
+				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
+			</ul>
+		</div>
+
+		<div id="directionsPanel" data-bind="visible: showDirections">
+			<button id="back-button-directions" type="button" class="btn btn-default btn-xs" data-bind="visible: showDirections" onclick="view.showFullLegend()">
+				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZnUzSkNCumO4XVfZ9V26yLh9Y__14C9U&libraries=places&callback=initMap"></script>
+	<script src="js/main.min.js"></script>
+	<script src="node_modules/oauth-signature/dist/oauth-signature.js"></script>
+	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
+</body>
+
+</html>
