@@ -605,9 +605,11 @@ var ViewModel = function(){
 		if( $(window).width() < 600 && map.controls[left].length === 1){
 			map.controls[left].clear();
 			map.controls[bottom].push(overlay);
+			map.setCenter(initialLocation);
 		}else if( $(window).width() > 600 && map.controls[bottom].length === 1){
 			map.controls[bottom].clear();
 			map.controls[left].push(overlay);
+			map.setCenter(initialLocation);
 		}
 
 	};
