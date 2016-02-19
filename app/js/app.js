@@ -10,6 +10,7 @@ var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
 var labelIndex = 0;
 var vicinity;
 var cll;
+var initialLocation;
 
 /**
  * Add google maps to screen with search box
@@ -86,7 +87,8 @@ var Place = function(name, position, rating, what, url){
 			title: name,
 			position: this.position,
 			label: labels[labelIndex++ % labels.length],
-			zoomOnClick: false
+			zoomOnClick: false,
+			animation: google.maps.Animation.DROP
 		});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
@@ -217,6 +219,7 @@ var ViewModel = function(){
 				var position = place.geometry.location;
 				vicinity = place.formatted_address;
 				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
+				initialLocation = new google.maps.LatLng(place.geometry.location.lat(),place.geometry.location.lng());
 
 				self.addStartPlace(name, position, vicinity);
 
@@ -409,9 +412,6 @@ var ViewModel = function(){
 				return prod.what == self.currentFilter();
 			});
 		}
-		google.maps.event.addListener(self.filterView, 'click', function() {
-			map.setCenter(self.listView()[0].marker.position);
-		});
 	});
 
 	/**
@@ -419,6 +419,8 @@ var ViewModel = function(){
 	 * @param {string} genre - Catagory to filter on
 	 */
 	self.filter = function (genre) {
+		map.setCenter(initialLocation);
+		map.setZoom(14);
 		self.currentFilter(genre);
 	};
 
@@ -460,6 +462,8 @@ var ViewModel = function(){
 	 * Choose a new catagory to search by pressing back button from results
 	 */
 	self.showOptionsAgain = function (){
+		map.setCenter(initialLocation);
+		map.setZoom(14);
 		if (self.listView().length > 1){
 			for (var i = 1; i < self.listView().length; i++) {
 				self.listView()[i].marker.setMap(null);
@@ -556,6 +560,7 @@ var ViewModel = function(){
 		}
 
 		localStorage.setItem("results", JSON.stringify(infoToSave));
+		localStorage.setItem("initialLocation", JSON.stringify(initialLocation));
 	};
 
 	/**
@@ -565,6 +570,8 @@ var ViewModel = function(){
 		self.listView([]);
 		var resultsFromLocalStorage = localStorage.getItem("results");
 		var resultsToUse = JSON.parse(resultsFromLocalStorage);
+		var initLocation = localStorage.getItem("initialLocation");
+		initialLocation = JSON.parse(initLocation);
 		labels[labelIndex=0];
 
 		self.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);

@@ -29,7 +29,7 @@
 				</button>
 				<h4 id="filter-title" data-bind="visible:showLegend">Filter by Type:</h4>
 			</span>
-			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
+			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter() }"></select>
 
 			<ul class="list-group" data-bind="foreach: filterView, visible:showFilter">
 				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
