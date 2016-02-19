@@ -104,7 +104,6 @@ var ViewModel = function(){
 	var self = this;
 	var searchBox;
 	var places;
-	var labelIndex = 0;
 	var directionsDisplay;
 	var directionsService;
 
