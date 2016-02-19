@@ -101,6 +101,7 @@ var Place = function(name, position, rating, what, url){
 
 /**
  * View model for website
+ * @namespace ViewModel
  */
 var ViewModel = function(){
 	var self = this,
@@ -121,6 +122,7 @@ var ViewModel = function(){
 	//this functionality turned off to meet project requirement for search capabilities
 	/**
 	 * Use W3C Geolocation to find users current position
+	 * @memberof ViewModel
 	 */
 	self.findLocation = function(){
 		var browserSupportFlag =  new Boolean();
@@ -177,6 +179,7 @@ var ViewModel = function(){
 
 	/**
 	 * Search box, used to find starting point for place searches if unable to use geolocation
+	 * @memberof ViewModel
 	 */
 	self.addSearch = function (){
 		// Create the search box and link it to the UI element.
@@ -240,6 +243,7 @@ var ViewModel = function(){
 	/**
 	 * Defines types for the findThings function to search weather results come from yelp api or google places api
 	 * Input is the catagories radio
+	 * @memberof ViewModel
 	 */
 	self.seePlaces = function (){
 		if(!self.listView()[0]){
@@ -277,6 +281,7 @@ var ViewModel = function(){
 	 * @param {string} name - The name of the starting place
 	 * @param {object} position - The latitude and longitude of the starting place
 	 * @param {string} vicinity - A formatted address for the starting place
+	 * @memberof ViewModel
 	 */
 	self.addStartPlace = function (name, position, vicinity){
 		self.listView.push(new StartPlace(name, position, vicinity));
@@ -289,6 +294,7 @@ var ViewModel = function(){
 	 * @param {number} rating - The rating of the place
 	 * @param {string} what - The catagory of the place e.g "Art Gallery"
 	 * @param {url} url - The URL to the yelp page of place (only supplied when info comes from yelp api and not google api)
+	 * @memberof ViewModel
 	 */
 	self.addPlace = function (name, position, rating, what, url){
 		self.listView.push(new Place(name, position, rating, what, url));
@@ -297,6 +303,7 @@ var ViewModel = function(){
 	/**
 	 * Sets the current place to clicked list item
 	 * @param {object} clickedPlace - The item from the self.filterView list that was clicked
+	 * @memberof ViewModel
 	 */
 	self.setPlace = function(clickedPlace){
 		if(clickedPlace !== self.listView()[0]){
@@ -310,6 +317,7 @@ var ViewModel = function(){
 	/**
 	 * Search google places api by type if yelp api fails
 	 * @param {array} what - An array of catagories for google to search for
+	 * @memberof ViewModel
 	 */
 	self.findThings = function (what){
 
@@ -350,6 +358,7 @@ var ViewModel = function(){
 
 	/**
 	 * Sort through yelp or google data and display based on various catagories
+	 * @memberof ViewModel
 	 */
 	self.displayPlaces = function (){
 		//adds google results to view.listView() if no yelp results
@@ -361,7 +370,7 @@ var ViewModel = function(){
 			//adds yelp info to view.listView() if rating is over 3.5 and is open
 			var yelp = yelpData.businesses;
 			for(var i = 0; i<yelp.length; i++){
-				if(yelp[i].rating >= 3.5 && !yelp[i].is_closed){
+				if(yelp[i].rating >= 3.5){
 					try{
 						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
 						self.addPlace(yelp[i].name, yelpLoc, yelp[i].rating, yelp[i].categories[0][0], yelp[i].url);
@@ -386,6 +395,7 @@ var ViewModel = function(){
 
 	/**
 	 * Filter results by catagory
+	 * @memberof ViewModel
 	 */
 	self.filterView = ko.computed(function(){
 		if(self.currentFilter() === "All"){
@@ -419,6 +429,7 @@ var ViewModel = function(){
 	/**
 	 * set the current type filter
 	 * @param {string} genre - Catagory to filter on
+	 * @memberof ViewModel
 	 */
 	self.filter = function (genre) {
 		map.setCenter(initialLocation);
@@ -428,6 +439,7 @@ var ViewModel = function(){
 
 	/**
 	 * show directions legend
+	 * @memberof ViewModel
 	 */
 	self.showDetailedDirections = function (){
 		self.showLegend(false);
@@ -436,6 +448,7 @@ var ViewModel = function(){
 
 	/**
 	 * show the places legend
+	 * @memberof ViewModel
 	 */
 	self.showFullLegend = function (){
 		self.showDirections(false);
@@ -444,6 +457,7 @@ var ViewModel = function(){
 
 	/**
 	 * show catagory options
+	 * @memberof ViewModel
 	 */
 	self.showCatagories = function (){
 		self.showOptions(true);
@@ -453,6 +467,7 @@ var ViewModel = function(){
 
 	/**
 	 * show results
+	 * @memberof ViewModel
 	 */
 	self.showResults = function (){
 		self.showOptions(false);
@@ -462,6 +477,7 @@ var ViewModel = function(){
 
 	/**
 	 * Choose a new catagory to search by pressing back button from results
+	 * @memberof ViewModel
 	 */
 	self.showOptionsAgain = function (){
 		map.setCenter(initialLocation);
@@ -492,6 +508,7 @@ var ViewModel = function(){
 	 * @param {number} rating - rating of place to get directions to
 	 * @param {string} what - catagory of place to get directions to
 	 * @param {string} url - URL to yelp reviews (only provided when results come from yelp not google)
+	 * @memberof ViewModel
 	 */
 	self.getDirections = function (where, name, marker, rating, what, url){
 		directionsDisplay.setMap(map);
@@ -525,6 +542,7 @@ var ViewModel = function(){
 	 * @param {string} url - URL to yelp reviews (only provided when results come from yelp not google)
 	 * @param {string} distance - distance from starting point to current item from google
 	 * @param {string} duration - how long it will take to get from starting point to current item from google
+	 * @memberof ViewModel
 	 */
 	self.showInfo = function (where, marker, rating, what, url, distance, duration){
 		var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating
@@ -550,6 +568,7 @@ var ViewModel = function(){
 
 	/**
 	 * Save the current starting place and place results to local storage
+	 * @memberof ViewModel
 	 */
 	self.saveInfo = function (){
 		var infoToSave = [];
@@ -567,6 +586,7 @@ var ViewModel = function(){
 
 	/**
 	 * Retrieve infomation from local storage
+	 * @memberof ViewModel
 	 */
 	self.getInfo = function (){
 		self.listView([]);
@@ -588,6 +608,7 @@ var ViewModel = function(){
 	/**
 	 * Creates the dataType array to filter results on
 	 * @param {array} what - array to get catagory types from
+	 * @memberof ViewModel
 	 */
 	self.setDataTypeArray = function (what){
 		for(var i = 1; i<what.length; i++){
@@ -599,6 +620,7 @@ var ViewModel = function(){
 
 	/**
 	 * Moves legend on screen resize to make site responsive
+	 * @memberof ViewModel
 	 */
 	self.changePositionOfLegend = function (){
 		var left = google.maps.ControlPosition.LEFT_TOP;

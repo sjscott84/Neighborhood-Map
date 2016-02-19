@@ -8,7 +8,6 @@ The results come from either the Yelp API or the Google Place API if Yelp is una
 
 	* Yelp API results must have a rating of at least 3.5 out of 5
 	* Google Places API results must have a rating of at least 3 out of 5
-	* Results from the Yelp API must be open now
 	* Google Places API is ranked by distance from starting location
 	* Yelp API has a radius filter to limit results to walking distance but is ranked by rating
 
@@ -20,7 +19,7 @@ This can be used for anywhere in the world, however, it works best in major citi
 
 ## Install
 
-No installation needed simply go to ...
+No installation needed simply go to http://sjscott84.github.io/Neighborhood-Map/dist
 
 ## Known Issues
 
@@ -31,4 +30,4 @@ Also, as I use filters to only show highly rated attractions, if Yelp fails and 
 
 ## Technical
 
-Technical details for this site can be found at...
+Technical details for this site can be found at https://github.com/sjscott84/Neighborhood-Map/tree/master/out

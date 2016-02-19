@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<meta charset="utf-8">
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Find Something To Do</title>
 	<link rel="stylesheet" href="css/styles.min.css">
 </head>
@@ -26,7 +26,7 @@
 				</button>
 				<h4 id="filter-title" data-bind="visible:showLegend">Filter by Type:</h4>
 			</span>
-			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter(value) }"></select>
+			<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter() }"></select>
 
 			<ul class="list-group" data-bind="foreach: filterView, visible:showFilter">
 				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace"></li>
@@ -43,7 +43,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZnUzSkNCumO4XVfZ9V26yLh9Y__14C9U&libraries=places&callback=initMap"></script>
 	<script src="js/main.min.js"></script>
-	<script src="node_modules/oauth-signature/dist/oauth-signature.js"></script>
+	<script src="../node_modules/oauth-signature/dist/oauth-signature.js"></script>
 	<script type="text/javascript" src="http://oauth.googlecode.com/svn/code/javascript/sha1.js"></script>
 </body>
 
