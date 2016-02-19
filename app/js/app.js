@@ -1,16 +1,16 @@
 'use strict';
-var map;
-var view;
-var startPoint = {lat:37.773972, lng: -122.431297};
-var infowindow;
-var yelpData;
-var googleData = [];
-var overlay = document.getElementById('googleOverlay');
-var labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ';
-var labelIndex = 0;
-var vicinity;
-var cll;
-var initialLocation;
+var map,
+	view,
+	startPoint = {lat:37.773972, lng: -122.431297},
+	infowindow,
+	yelpData,
+	googleData = [],
+	overlay = document.getElementById('googleOverlay'),
+	labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ',
+	labelIndex = 0,
+	vicinity,
+	cll,
+	initialLocation;
 
 /**
  * Add google maps to screen with search box
@@ -59,11 +59,11 @@ var StartPlace = function(name, position, vicinity){
 	this.position = position;
 	this.vicinity = vicinity;
 	this.marker = new google.maps.Marker({
-			map: map,
-			title: name,
-			icon: 'http://maps.gstatic.com/mapfiles/markers2/marker_greenA.png',
-			position: this.position,
-		});
+		map: map,
+		title: name,
+		icon: 'http://maps.gstatic.com/mapfiles/markers2/marker_greenA.png',
+		position: this.position
+	});
 	this.listName = "A - "+name;
 };
 
@@ -83,13 +83,13 @@ var Place = function(name, position, rating, what, url){
 	this.what = what;
 	this.url = url;
 	this.marker = new google.maps.Marker({
-			map: map,
-			title: name,
-			position: this.position,
-			label: labels[labelIndex++ % labels.length],
-			zoomOnClick: false,
-			animation: google.maps.Animation.DROP
-		});
+		map: map,
+		title: name,
+		position: this.position,
+		label: labels[labelIndex++ % labels.length],
+		zoomOnClick: false,
+		animation: google.maps.Animation.DROP
+	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
 		view.showFullLegend();
@@ -103,11 +103,11 @@ var Place = function(name, position, rating, what, url){
  * View model for website
  */
 var ViewModel = function(){
-	var self = this;
-	var searchBox;
-	var places;
-	var directionsDisplay;
-	var directionsService;
+	var self = this,
+		searchBox,
+		places,
+		directionsDisplay,
+		directionsService;
 
 	self.showOptions = ko.observable(true);
 	self.showLegend = ko.observable(false);
@@ -168,9 +168,9 @@ var ViewModel = function(){
 					} else {
 					window.alert('No results found');
 					}
-					} else {
+				} else {
 					window.alert('Geocoder failed due to: ' + status);
-					}
+				}
 			});
 		}
 	};
@@ -267,7 +267,7 @@ var ViewModel = function(){
 						forSearchYelp = 'aquariums,diving,fishing,horsebackriding,snorkeling,zoos';
 						break;
 				}
-				yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle);
+				yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle, view);
 			});
 		}
 	};
@@ -299,9 +299,12 @@ var ViewModel = function(){
 	 * @param {object} clickedPlace - The item from the self.filterView list that was clicked
 	 */
 	self.setPlace = function(clickedPlace){
-		self.currentPlace(clickedPlace);
-		self.showFullLegend();
-		self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker, self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
+		if(clickedPlace !== self.listView()[0]){
+			self.currentPlace(clickedPlace);
+			self.showFullLegend();
+			self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker,
+			self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
+		}
 	};
 
 	/**
@@ -318,7 +321,6 @@ var ViewModel = function(){
 				for (var i = 0; i < results.length; i++) {
 					var place = results[i];
 					if(place.rating >= 3){
-						
 						var thePlace = { 
 							name: place.name, 
 							position: place.geometry.location, 
@@ -398,7 +400,7 @@ var ViewModel = function(){
 		if (!self.currentFilter()) {
 			return self.listView();
 		} else {
-			return ko.utils.arrayFilter(self.listView(), function (prod) {
+			return ko.utils.arrayFilter(self.listView(), function (clickedFilter) {
 				infowindow.close();
 				directionsDisplay.setMap(null);
 				directionsDisplay.setPanel(null);
@@ -409,7 +411,7 @@ var ViewModel = function(){
 						self.listView()[i].marker.setMap(map);
 					}
 				}
-				return prod.what == self.currentFilter();
+				return clickedFilter.what == self.currentFilter();
 			});
 		}
 	});
@@ -428,8 +430,8 @@ var ViewModel = function(){
 	 * show directions legend
 	 */
 	self.showDetailedDirections = function (){
-			self.showLegend(false);
-			self.showDirections(true);
+		self.showLegend(false);
+		self.showDirections(true);
 	};
 
 	/**

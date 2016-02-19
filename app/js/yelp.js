@@ -1,18 +1,27 @@
+/**
+ * Call to Yelp API to get search results
+ * @param {string} what - a string of catagories for Yelp tp search for
+ * @param {string} where - the name of the location yelp uses as a searh point
+ * @param {string} position - the latitude and longitude for yelp to search
+ * @param {array} getGoogle - catagories for the Google Places API to search for if Yelp fails
+ * @param {object} viewModel - the viewModel from app.js
+ */
+function yelpHell (what, where, position, getGoogle, viewModel){
+	var radiusInMeters = 5000,
+		setTimeoutTime = 5000;
 
-function yelpHell (what, where, position, getGoogle){
-
+	//Generate random number for each call to Yelp API
 	function nonce_generate() {
 		return (Math.floor(Math.random() * 1e12).toString());
 	}
 
+	//function to handle error when call to yelp api fails
 	var yelpError = setTimeout(function(){
 		alert("Yelp is currently unavailable, results will come from Google")
-		view.findThings(getGoogle);
-		;}, 5000);
+		viewModel.findThings(getGoogle);
+	;}, setTimeoutTime);
 
 	var yelp_url = 'https://api.yelp.com/v2/search?';
-	//var terms = what.join(', ');
-	console.log(what);
 
 	var parameters = {
 		//term: terms,
@@ -21,10 +30,10 @@ function yelpHell (what, where, position, getGoogle){
 		cll: position,
 		limit: 20,
 		offset: 20,
-		radius_filter: 5000, //1609,
+		radius_filter: radiusInMeters,
 		sort: 2,
 		oauth_consumer_key: 'eOiRip_OTWAQMok1jVmN0w',
-		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',//added ! for error testing
+		oauth_token: 'IqSuxajKL9sRic-mc_nzpQBLdxdTNdfA',
 		oauth_nonce: nonce_generate(),
 		oauth_timestamp: Math.floor(Date.now()/1000),
 		oauth_signature_method: 'HMAC-SHA1',
@@ -46,18 +55,12 @@ function yelpHell (what, where, position, getGoogle){
 		success: function(results) {
 			yelpData = Object.assign({}, results);
 			console.log("SUCCCESS! %o", results);
-			view.displayPlaces();
+			viewModel.displayPlaces();
 			clearTimeout(yelpError);
 		}
-		//error: function(jqXHR, textStatus, errorThrown) {
-			// Do stuff on fail
-			//alert("Yelp is currently unavailable, results will come from Google")
-			//findThings(yelpError);
-			//console.log(jqXHR);
-		//}
+		//error: on error the yelpError function is called
 	};
 
 	// Send AJAX query via jQuery library.
 	$.ajax(settings);
-
 }
