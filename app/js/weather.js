@@ -1,4 +1,12 @@
 function getWeather (state, city){
+	var setTimeoutTime = 5000;
+
+	//function to handle error when call to weather api fails
+	var weatherError = setTimeout(function(){
+		view.showForecast(false);
+		alert("Weather is currently unavaliable")
+	;}, setTimeoutTime);
+
 	jQuery(document).ready(function($) {
 		$.ajax({
 			url : "http://api.wunderground.com/api/ac44691336e9176f/geolookup/conditions/hourly/q/"+state+"/"+city+".json",
@@ -21,7 +29,9 @@ function getWeather (state, city){
 				}
 
 				view.showWeather(currentCondition, currentTemp, currentIcon, forecastCondition, forecastTime, forecastIcon, forecastTemp);
+				clearTimeout(weatherError);
 			}
+			//error: on error the weatherError function is called
 		});
 	});
 }
