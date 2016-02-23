@@ -117,8 +117,10 @@ var ViewModel = function(){
 		directionsService;
 
 	self.showOptions = ko.observable(true);
+	self.showForecast = ko.observable(false);
 	self.showLegend = ko.observable(false);
 	self.showDirections = ko.observable(false);
+	self.weatherTable = ko.observableArray([]);
 	self.listView = ko.observableArray([]);
 	self.currentPlace = ko.observable();
 	self.dataType = ko.observableArray(["All"]);
@@ -233,6 +235,7 @@ var ViewModel = function(){
 				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
 				initialLocation = new google.maps.LatLng(place.geometry.location.lat(),place.geometry.location.lng());
 
+				//get state or country for weather search
 				for(var i = 0; i < weatherPlace.length; i++){
 					if(weatherPlace[i].types[0] === "country"){
 						if(weatherPlace[i].short_name === "US"){
@@ -247,6 +250,7 @@ var ViewModel = function(){
 					}
 				}
 
+				//get city for weather search
 				for(var j = 0; j < weatherPlace.length; j++){
 					if(weatherPlace[j].types[0] === "locality"){
 						cityForWeather = weatherPlace[j].long_name;
@@ -266,10 +270,33 @@ var ViewModel = function(){
 				map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
 				console.log(cityForWeather+', '+stateForWeather);
-				//getWeather(cityForWeather);
+				getWeather(stateForWeather, cityForWeather);
 			});
 		});
 	};
+
+	self.showWeather = function(currentCondition, currentTemp, currentIcon, forcastCondition, forecastTime, forcastIcon, forcastTemp){
+
+		var currentCondition = currentCondition;
+		var currentTemp = currentTemp;
+		var currentIcon = currentIcon;
+		var forecastCondition = forcastCondition;
+		var forecastTime = forecastTime;
+		var forecastIcon = forcastIcon;
+		var forecastTemp = forcastTemp;
+
+		self.showForecast(true);
+
+		self.weatherTable.push({time: "Now", url: currentIcon, condition: currentCondition+" - "+currentTemp+"F"})
+
+		for(var i = 0; i < forecastTime.length; i++){
+			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"})
+		}
+
+		alert(self.weatherTable()[0].time+" "+self.weatherTable()[0].url+" "+self.weatherTable()[0].condition);
+
+		//self.showForecast(true);
+	}
 
 	/**
 	 * Defines types for the findThings function to search weather results come from yelp api or google places api

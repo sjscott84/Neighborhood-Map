@@ -22,6 +22,20 @@
 			<label><input type="radio" name="whatToDo" value="animals">Animals</label><br>
 			<button type="button" class="btn btn-default center-block" onclick="view.seePlaces()">Get Places to See!</button>
 		</div>
+
+		<div data-bind="visible: showForecast" id="weather" class="table">
+			<h4>12 Hour Weather Forecast</h4>
+			<table>
+				<tbody data-bind="foreach: weatherTable">
+					<tr>
+						<td id="time" data-bind="text: $data.time"></td>
+						<td id="url"><img class="weatherImage" data-bind="attr:{src: $data.url}"></img></td>
+						<td id="conditions" data-bind="text: $data.condition"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
 		<div id="legend" data-bind="visible: showLegend">
 			<span data-bind="visible: showLegend">
 				<button id="back-button" type="button" class="btn btn-default btn-xs" onclick="view.showOptionsAgain()">

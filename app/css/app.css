@@ -84,7 +84,7 @@ html, body {
 	font-family: Roboto;
 	font-size: 15px;
 	font-weight: 300;
-	width: 250px;
+	width: 275px;
 	height: 80%;
 	margin-top: 12px;
 	margin-left: 12px;
@@ -93,6 +93,28 @@ html, body {
 	overflow-y: scroll;
 }
 
+#weather {
+	display: table;
+}
+
+.weatherImage {
+	width: 30px;
+	height: 30px;
+}
+
+#time {
+	width: 65px;
+}
+
+#url {
+	width: 30px
+	padding: 5px;
+}
+
+#conditions {
+	padding: 5px;
+	width: 148px;
+}
 @media (max-width: 600px){
 	#googleOverlay {
 		width: 90%;
