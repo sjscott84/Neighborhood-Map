@@ -26,6 +26,8 @@ function initMap(){
 
 	infowindow = new google.maps.InfoWindow;
 
+	localStorage.clear();
+
 	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
 
@@ -82,16 +84,20 @@ var Place = function(name, position, rating, what, url){
 	this.rating = rating;
 	this.what = what;
 	this.url = url;
+	//this.label = labels[labelIndex++ % labels.length];
 	this.marker = new google.maps.Marker({
 		map: map,
 		title: name,
 		position: this.position,
 		label: labels[labelIndex++ % labels.length],
 		zoomOnClick: false,
+		//icon: 'http://www.googlemapsmarkers.com/v1/'+this.label+'/0099FF',
 		animation: google.maps.Animation.DROP
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
-		this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
+		//this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
+		//this.icon = 'http://www.googlemapsmarkers.com/v1/'+this.label+'/FF0000',
+		//this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
 		view.showFullLegend();
 		view.getDirections(position, name, this, rating, what, url);
 	});
@@ -220,9 +226,32 @@ var ViewModel = function(){
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
+				var weatherPlace = place.address_components;
+				var stateForWeather;
+				var cityForWeather;
 				vicinity = place.formatted_address;
 				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
 				initialLocation = new google.maps.LatLng(place.geometry.location.lat(),place.geometry.location.lng());
+
+				for(var i = 0; i < weatherPlace.length; i++){
+					if(weatherPlace[i].types[0] === "country"){
+						if(weatherPlace[i].short_name === "US"){
+							for(var j = 0; j < weatherPlace.length; j++){
+								if(weatherPlace[j].types[0] === "administrative_area_level_1"){
+									stateForWeather = weatherPlace[j].short_name;
+								}
+							}
+						}else{
+							stateForWeather = weatherPlace[i].long_name;
+						}
+					}
+				}
+
+				for(var j = 0; j < weatherPlace.length; j++){
+					if(weatherPlace[j].types[0] === "locality"){
+						cityForWeather = weatherPlace[j].long_name;
+					}
+				}
 
 				self.addStartPlace(name, position, vicinity);
 
@@ -236,6 +265,8 @@ var ViewModel = function(){
 				map.fitBounds(bounds);
 				map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
+				console.log(cityForWeather+', '+stateForWeather);
+				//getWeather(cityForWeather);
 			});
 		});
 	};
@@ -391,6 +422,7 @@ var ViewModel = function(){
 		}
 
 		self.setDataTypeArray(self.listView());
+
 	};
 
 	/**
