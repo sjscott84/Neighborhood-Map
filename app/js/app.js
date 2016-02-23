@@ -221,6 +221,7 @@ var ViewModel = function(){
 				labels[labelIndex=0];
 				self.showCatagories();
 				self.listView([]);
+				self.weatherTable([]);
 				yelpData = {};
 				googleData = [];
 				self.dataType(["All"]);
@@ -292,10 +293,6 @@ var ViewModel = function(){
 		for(var i = 0; i < forecastTime.length; i++){
 			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"})
 		}
-
-		alert(self.weatherTable()[0].time+" "+self.weatherTable()[0].url+" "+self.weatherTable()[0].condition);
-
-		//self.showForecast(true);
 	}
 
 	/**
@@ -520,6 +517,7 @@ var ViewModel = function(){
 	 */
 	self.showCatagories = function (){
 		self.showOptions(true);
+		self.showForecast(true);
 		self.showLegend(false);
 		self.showFilter(false);
 	};
@@ -530,6 +528,7 @@ var ViewModel = function(){
 	 */
 	self.showResults = function (){
 		self.showOptions(false);
+		self.showForecast(false);
 		self.showLegend(true);
 		self.showFilter(true);
 	};
