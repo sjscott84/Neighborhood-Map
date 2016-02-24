@@ -92,7 +92,7 @@ var Place = function(name, position, rating, what, url){
 		label: labels[labelIndex++ % labels.length],
 		zoomOnClick: false,
 		//icon: 'http://www.googlemapsmarkers.com/v1/'+this.label+'/0099FF',
-		animation: google.maps.Animation.DROP
+		//animation: google.maps.Animation.DROP
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		//this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
@@ -100,6 +100,7 @@ var Place = function(name, position, rating, what, url){
 		//this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
 		view.showFullLegend();
 		view.getDirections(position, name, this, rating, what, url);
+
 	});
 
 	this.listName = this.marker.label+" - "+name;
@@ -270,8 +271,7 @@ var ViewModel = function(){
 				map.fitBounds(bounds);
 				map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
-				console.log(cityForWeather+', '+stateForWeather);
-				getWeather(stateForWeather, cityForWeather);
+				//getWeather(stateForWeather, cityForWeather);
 			});
 		});
 	};
@@ -446,8 +446,23 @@ var ViewModel = function(){
 		}
 
 		self.setDataTypeArray(self.listView());
+		self.fitBoundsToVisibleMarkers()
 
 	};
+
+	self.fitBoundsToVisibleMarkers = function() {
+
+		var bounds = new google.maps.LatLngBounds();
+
+		for (var i=0; i<self.listView().length; i++) {
+			if(self.listView()[i].marker.getVisible()) {
+				bounds.extend(self.listView()[i].marker.getPosition() );
+			}
+		}
+
+		map.fitBounds(bounds);
+
+	}
 
 	/**
 	 * Filter results by catagory
@@ -488,9 +503,10 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.filter = function (genre) {
-		map.setCenter(initialLocation);
-		map.setZoom(14);
+		//map.setCenter(initialLocation);
+		//map.setZoom(14);
 		self.currentFilter(genre);
+		self.fitBoundsToVisibleMarkers()
 	};
 
 	/**
