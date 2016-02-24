@@ -17,12 +17,21 @@ var map,
 */
 function initMap(){
 
+	var timeoutMiliSeconds = 4000;
+
+	var timer = window.setTimeout(onLoadError, timeoutMiliSeconds);
+
 	map = new google.maps.Map(document.getElementById('map'),{
 		center: startPoint,
 		zoom: 12,
 		mapTypeControl: false,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
+
+	//Error if map does not load
+	function onLoadError(){
+		alert("Google is currently unavaliable, please try again later");
+	}
 
 	infowindow = new google.maps.InfoWindow;
 
@@ -46,6 +55,10 @@ function initMap(){
 		map.setCenter(view.listView()[0].position);
 		view.showResults();
 	}
+
+	google.maps.event.addListener(map, 'tilesloaded', function () {
+		window.clearTimeout(timer);
+	});
 
 }
 
@@ -271,7 +284,7 @@ var ViewModel = function(){
 				map.fitBounds(bounds);
 				map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
-				//getWeather(stateForWeather, cityForWeather);
+				getWeather(stateForWeather, cityForWeather);
 			});
 		});
 	};
@@ -450,6 +463,10 @@ var ViewModel = function(){
 
 	};
 
+	/**
+	 * Fit bounds of map to visible markers
+	 * @memberof ViewModel
+	 */
 	self.fitBoundsToVisibleMarkers = function() {
 
 		var bounds = new google.maps.LatLngBounds();
@@ -503,8 +520,6 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.filter = function (genre) {
-		//map.setCenter(initialLocation);
-		//map.setZoom(14);
 		self.currentFilter(genre);
 		self.fitBoundsToVisibleMarkers()
 	};

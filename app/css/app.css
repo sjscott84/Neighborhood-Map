@@ -59,6 +59,10 @@ html, body {
 	width: 275px;
 }
 
+.selectedItem {
+	background-color: #ff0;
+}
+
 #pac-input:focus {
 	border-color: #4d90fe;
 }
