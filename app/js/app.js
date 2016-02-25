@@ -47,6 +47,7 @@ function initMap(){
 		map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(overlay);
 	}
 
+	//Load data in local storage if any
 	if (localStorage.getItem("results") !== null) {
 		view.getInfo();
 		vicinity = view.listView()[0].vicinity;
@@ -56,6 +57,7 @@ function initMap(){
 		view.showResults();
 	}
 
+	//Clear error handling setTimout once all tiles have loaded
 	google.maps.event.addListener(map, 'tilesloaded', function () {
 		window.clearTimeout(timer);
 	});
@@ -140,6 +142,9 @@ var ViewModel = function(){
 	self.dataType = ko.observableArray(["All"]);
 	self.showFilter = ko.observable(false);
 	self.currentFilter = ko.observable();
+	self.textFilter = ko.observable("");
+	self.showTextFilter = ko.observable(true);
+	self.showDropdownFilter = ko.observable(true);
 
 	//this functionality turned off to meet project requirement for search capabilities
 	/**
@@ -239,6 +244,7 @@ var ViewModel = function(){
 				yelpData = {};
 				googleData = [];
 				self.dataType(["All"]);
+				self.textFilter("");
 			//}
 			places.forEach(function(place) {
 				var name = place.name;
@@ -281,8 +287,9 @@ var ViewModel = function(){
 					bounds.extend(place.geometry.location);
 				}
 
+				map.setCenter(initialLocation);
 				map.fitBounds(bounds);
-				map.setZoom(14);
+				//map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
 				getWeather(stateForWeather, cityForWeather);
 			});
@@ -471,6 +478,7 @@ var ViewModel = function(){
 
 		var bounds = new google.maps.LatLngBounds();
 
+
 		for (var i=0; i<self.listView().length; i++) {
 			if(self.listView()[i].marker.getVisible()) {
 				bounds.extend(self.listView()[i].marker.getPosition() );
@@ -478,40 +486,102 @@ var ViewModel = function(){
 		}
 
 		map.fitBounds(bounds);
-
 	}
 
 	/**
-	 * Filter results by catagory
+	 * Remove any directions from screen before change position of markers
 	 * @memberof ViewModel
 	 */
-	self.filterView = ko.computed(function(){
-		if(self.currentFilter() === "All"){
-			for(var i = 0; i<self.listView().length; i++){
-				self.listView()[i].marker.setMap(map);
-				directionsDisplay.setMap(null);
-				directionsDisplay.setPanel(null);
-				infowindow.close();
-			}
+	self.removeDirections = function (){
+		if(infowindow){
+			infowindow.close();
+		}
+		if(directionsDisplay){
+			directionsDisplay.setMap(null);
+			directionsDisplay.setPanel(null);
+		}
+	};
+
+	/**
+	 * Filter the list view of places based on the filter
+	 * @memberof ViewModel
+	 */
+	self.filterPlaces = ko.computed(function() {
+		//If both filters at starting point
+		if(self.currentFilter() === "All" && !self.textFilter()){
 			return self.listView();
 		}
-		if (!self.currentFilter()) {
-			return self.listView();
-		} else {
+		//If Dropdown catagory filter selected
+		if(self.currentFilter() != "All"){
 			return ko.utils.arrayFilter(self.listView(), function (clickedFilter) {
-				infowindow.close();
-				directionsDisplay.setMap(null);
-				directionsDisplay.setPanel(null);
-				for (var i = 1; i < self.listView().length; i++) {
-					if(self.listView()[i].what !== self.currentFilter()){
-						self.listView()[i].marker.setMap(null);
-					}else{
-						self.listView()[i].marker.setMap(map);
-					}
-				}
 				return clickedFilter.what == self.currentFilter();
 			});
 		}
+		//If text filter selected
+		if(self.textFilter()){
+			var filter = self.textFilter().toLowerCase();
+			return ko.utils.arrayFilter(self.listView(), function (rec) {
+				var result = rec.listName.toLowerCase();
+				if(result.indexOf(filter) > -1){
+					return result;
+				};
+			});
+		}
+	});
+
+	/**
+	 * Filter marker placement by catagory
+	 * @memberof ViewModel
+	 */
+	self.filterView = ko.computed(function (){
+		if(self.currentFilter() === "All"){
+			self.showTextFilter(true);
+			self.removeDirections();
+			//self.fitBoundsToVisibleMarkers();
+			for(var i = 0; i<self.listView().length; i++){
+				self.listView()[i].marker.setMap(map);
+			}
+		}else{
+			self.removeDirections();
+			self.showTextFilter(false);
+			//self.fitBoundsToVisibleMarkers();
+			for (var i = 1; i < self.listView().length; i++) {
+				if(self.listView()[i].what !== self.currentFilter()){
+					self.listView()[i].marker.setMap(null);
+				}else{
+					self.listView()[i].marker.setMap(map);
+				}
+			}
+		}
+	});
+
+	/**
+	 * Filter marker placement by text filter
+	 * @memberof ViewModel
+	 */
+	self.textFilterResults = ko.computed( function () {
+		if(!self.textFilter()){
+			self.showDropdownFilter(true);
+			self.removeDirections();
+			//self.fitBoundsToVisibleMarkers();
+			for(var i = 1; i < self.listView().length; i++){
+				self.listView()[i].marker.setMap(map);
+			}
+		}else{
+			self.showDropdownFilter(false);
+			self.removeDirections();
+			//self.fitBoundsToVisibleMarkers();
+			var filter = self.textFilter().toLowerCase();
+
+			for(var i = 1; i < self.listView().length; i++){
+				if(self.listView()[i].name.toLowerCase().indexOf(filter) > -1){
+					self.listView()[i].marker.setMap(map);
+				}else{
+					self.listView()[i].marker.setMap(null);
+				}
+			}
+		}
+		//self.fitBoundsToVisibleMarkers();
 	});
 
 	/**
