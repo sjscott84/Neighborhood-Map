@@ -99,18 +99,20 @@ var Place = function(name, position, rating, what, url){
 	this.rating = rating;
 	this.what = what;
 	this.url = url;
-	//this.label = labels[labelIndex++ % labels.length];
+	this.iconColor = getMarkerColor(this.what);
+	this.label = labels[labelIndex++ % labels.length];
 	this.marker = new google.maps.Marker({
 		map: map,
 		title: name,
 		position: this.position,
-		label: labels[labelIndex++ % labels.length],
+		//label: labels[labelIndex++ % labels.length],
 		zoomOnClick: false,
-		//icon: 'http://www.googlemapsmarkers.com/v1/'+this.label+'/0099FF',
+		icon: 'http://www.googlemapsmarkers.com/v1/'+this.label+'/'+this.iconColor
 		//animation: google.maps.Animation.DROP
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
-		//this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
+		view.changeMarkerBack();
+		this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		//this.icon = 'http://www.googlemapsmarkers.com/v1/'+this.label+'/FF0000',
 		//this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
 		view.showFullLegend();
@@ -118,7 +120,7 @@ var Place = function(name, position, rating, what, url){
 
 	});
 
-	this.listName = this.marker.label+" - "+name;
+	this.listName = this.label+" - "+name;
 };
 
 /**
@@ -381,11 +383,13 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.setPlace = function(clickedPlace){
+		self.changeMarkerBack();
 		if(clickedPlace !== self.listView()[0]){
 			self.currentPlace(clickedPlace);
 			self.showFullLegend();
 			self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker,
 			self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
+			self.currentPlace().marker.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		}
 	};
 
@@ -476,16 +480,32 @@ var ViewModel = function(){
 	 */
 	self.fitBoundsToVisibleMarkers = function() {
 
-		var bounds = new google.maps.LatLngBounds();
+		if(map){
 
+			var bounds = new google.maps.LatLngBounds();
 
-		for (var i=0; i<self.listView().length; i++) {
-			if(self.listView()[i].marker.getVisible()) {
-				bounds.extend(self.listView()[i].marker.getPosition() );
+			for (var i=0; i<self.listView().length; i++) {
+				if(self.listView()[i].marker.getVisible()) {
+					bounds.extend(self.listView()[i].marker.getPosition() );
+				}
+			}
+
+			map.fitBounds(bounds);
+		}
+	}
+
+	/**
+	 * If marker was changed to a red B on click this function changes it back to its original form
+	 * @memberof ViewModel
+	 */
+	self.changeMarkerBack = function (){
+		if(map){
+			for (var i = 0; i<view.listView().length; i++){
+				if(view.listView()[i].marker.icon === 'http://www.googlemapsmarkers.com/v1/B/FF0000'){
+					view.listView()[i].marker.setIcon('http://www.googlemapsmarkers.com/v1/'+view.listView()[i].label+'/'+view.listView()[i].iconColor);
+				}
 			}
 		}
-
-		map.fitBounds(bounds);
 	}
 
 	/**
@@ -494,6 +514,7 @@ var ViewModel = function(){
 	 */
 	self.removeDirections = function (){
 		if(infowindow){
+			self.changeMarkerBack();
 			infowindow.close();
 		}
 		if(directionsDisplay){
@@ -537,14 +558,14 @@ var ViewModel = function(){
 		if(self.currentFilter() === "All"){
 			self.showTextFilter(true);
 			self.removeDirections();
-			//self.fitBoundsToVisibleMarkers();
+			self.fitBoundsToVisibleMarkers();
 			for(var i = 0; i<self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
 			}
 		}else{
 			self.removeDirections();
 			self.showTextFilter(false);
-			//self.fitBoundsToVisibleMarkers();
+			self.fitBoundsToVisibleMarkers();
 			for (var i = 1; i < self.listView().length; i++) {
 				if(self.listView()[i].what !== self.currentFilter()){
 					self.listView()[i].marker.setMap(null);
@@ -563,14 +584,14 @@ var ViewModel = function(){
 		if(!self.textFilter()){
 			self.showDropdownFilter(true);
 			self.removeDirections();
-			//self.fitBoundsToVisibleMarkers();
+			self.fitBoundsToVisibleMarkers();
 			for(var i = 1; i < self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
 			}
 		}else{
 			self.showDropdownFilter(false);
 			self.removeDirections();
-			//self.fitBoundsToVisibleMarkers();
+			self.fitBoundsToVisibleMarkers();
 			var filter = self.textFilter().toLowerCase();
 
 			for(var i = 1; i < self.listView().length; i++){
