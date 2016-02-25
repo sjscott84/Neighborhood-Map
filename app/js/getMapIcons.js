@@ -2,16 +2,16 @@ function getMarkerColor (catagory){
 	var iconColor;
 	switch (catagory){
 		case 'park':
-			iconColor = '003300';
+			iconColor = '66ffcc';
 			break;
 		case 'Parks':
-			iconColor = '003300';
+			iconColor = '66ffcc';
 			break;
 		case 'zoo':
 			iconColor = '330000';
 			break;
 		case 'Playgrounds':
-			iconColor = '009900';
+			iconColor = '99ccff';
 		case 'Gardens':
 			iconColor = 'ff6600';
 			break;
@@ -40,7 +40,7 @@ function getMarkerColor (catagory){
 			iconColor = '000033';
 			break;
 		case 'art_gallery':
-			iconColor = '003300';
+			iconColor = '66ffcc';
 			break;
 		case 'library':
 			iconColor = '000033';
@@ -49,7 +49,7 @@ function getMarkerColor (catagory){
 			iconColor = '0000ff';
 			break;
 		case 'Art Galleries':
-			iconColor = '003300';
+			iconColor = '66ffcc';
 			break;
 		case 'Cultural Center':
 			iconColor = '6666cc';
@@ -64,13 +64,13 @@ function getMarkerColor (catagory){
 			iconColor = 'ffff00';
 			break;
 		case 'Landmarks & Historical Buildings':
-			iconColor = '009900';
+			iconColor = '99ccff';
 			break;
 		case 'amusement_park':
 			iconColor = 'ff9933';
 			break;
 		case 'bowling_alley':
-			iconColor = '003300';
+			iconColor = '66ffcc';
 			break;
 		case 'Arcades':
 			iconColor = 'cc0066';
@@ -88,7 +88,7 @@ function getMarkerColor (catagory){
 			iconColor = '000033';
 			break;
 		case 'Mini Golf':
-			iconColor = '009900';
+			iconColor = '99ccff';
 			break;
 		case 'Skating Rinks':
 			iconColor = 'cc6699';
@@ -110,6 +110,9 @@ function getMarkerColor (catagory){
 			break;
 		case 'Zoos':
 			iconColor = '330000';
+			break;
+		case 'Dog Parks':
+			iconColor = '993300';
 			break;
 		default:
 			iconColor = 'ff0000';

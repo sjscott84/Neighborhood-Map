@@ -86,6 +86,7 @@ var StartPlace = function(name, position, vicinity){
 
 /**
  * The place object for the results returned from yelp or google
+ * Markers from http://www.googlemapsmarkers.com/
  * @param {string} name - The name of the place
  * @param {object} position - The latitude and longitude of the place
  * @param {number} rating - The rating of the place
@@ -147,6 +148,7 @@ var ViewModel = function(){
 	self.textFilter = ko.observable("");
 	self.showTextFilter = ko.observable(true);
 	self.showDropdownFilter = ko.observable(true);
+	self.weatherLoad = ko.observable(true);
 
 	//this functionality turned off to meet project requirement for search capabilities
 	/**
@@ -315,6 +317,8 @@ var ViewModel = function(){
 		for(var i = 0; i < forecastTime.length; i++){
 			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"})
 		}
+
+		self.weatherLoad(false);
 	}
 
 	/**

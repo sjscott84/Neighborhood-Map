@@ -7,6 +7,7 @@
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<link href="css/app.css" rel="stylesheet">
 	<!--endbuild-->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -20,11 +21,12 @@
 			<label><input type="radio" name="whatToDo" value="amusement">Amusement</label><br>
 			<label><input type="radio" name="whatToDo" value="outdoors">Outdoor Pursuits</label><br>
 			<label><input type="radio" name="whatToDo" value="animals">Animals</label><br>
-			<button type="button" class="btn btn-default center-block" onclick="view.seePlaces()">Get Places to See!</button>
+			<button data-bind="click: seePlaces" type="button" class="btn btn-default center-block">Get Places to See!</button>
 		</div>
 
 		<div data-bind="visible: showForecast" id="weather" class="table">
 			<h4>12 Hour Weather Forecast</h4>
+			<i data-bind="visible: weatherLoad" class='fa fa-spinner fa-pulse'></i>
 			<table>
 				<tbody data-bind="foreach: weatherTable">
 					<tr>
@@ -40,7 +42,7 @@
 		<div id="legend" data-bind="visible: showLegend">
 
 			<span data-bind="visible: showLegend">
-				<button id="back-button" type="button" class="btn btn-default btn-xs" onclick="view.showOptionsAgain()">
+				<button data-bind="click: showOptionsAgain" id="back-button" type="button" class="btn btn-default btn-xs">
 				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
 				</button><br>
 			</span>
@@ -62,7 +64,7 @@
 		</div>
 
 		<div id="directionsPanel" data-bind="visible: showDirections">
-			<button id="back-button-directions" type="button" class="btn btn-default btn-xs" data-bind="visible: showDirections" onclick="view.showFullLegend()">
+			<button data-bind="click: showFullLegend" id="back-button-directions" type="button" class="btn btn-default btn-xs" data-bind="visible: showDirections">
 				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
 			</button>
 		</div>
