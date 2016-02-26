@@ -305,7 +305,7 @@ var ViewModel = function(){
 				map.fitBounds(bounds);
 				//map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
-				getWeather(stateForWeather, cityForWeather);
+				//getWeather(stateForWeather, cityForWeather);
 			});
 		});
 	};

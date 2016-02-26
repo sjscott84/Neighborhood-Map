@@ -13,24 +13,12 @@ html, body {
 	background-color: #333;
 }
 
-#back-button {
-	margin-top: 10px;
-	float: left;
+#back-button-button {
+	margin-top: 5px;
 }
 
 #back-button-directions {
 	margin-top: 5px;
-}
-
-#filter-title {
-	float: left;
-	padding-left: 20px;
-}
-
-#filter {
-	font-family: Roboto;
-	font-size: 15px;
-	font-weight: 300;
 }
 
 .controls {
@@ -75,10 +63,22 @@ html, body {
 	font-family: Roboto;
 }
 
+#radioOptions {
+	display: block;
+}
+
 #type-selector {
 	color: #fff;
 	background-color: #4d90fe;
 	padding: 5px 11px 0px 11px;
+}
+
+#textFilter {
+	padding-top: 5px;
+}
+
+#dropdownFilter {
+	padding-top: 5px;
 }
 
 #type-selector label {
@@ -137,22 +137,58 @@ html, body {
 		bottom: 300px;
 	}
 
-	#filter {
+	#back-button {
+		float: left;
+	}
+
+	#textFilter {
+		float: left;
+		padding-left: 10px;
+		padding-top: 0px;
+	}
+
+	#dropdownFilter {
+		float: left;
+		padding-left: 20px;
+		padding-top: 0px;
+	}
+
+	.list-group {
+		padding-top: 80px;
+	}
+
+	#radioOptions {
+		display: inline-block;
+		padding-right: 5px;
+		padding-bottom: 5px;
+	}
+}
+
+@media (max-width: 510px){
+
+	#back-button {
+		float: none;
 		display:inline-block;
-		margin-top: 10px;
-		margin-left: 20px;
+	}
+
+	#dropdownFilter {
+		float: none;
+		display:inline-block;
+		padding-left: 0px;
+		padding-top: 5px;
+	}
+
+	#textFilter {
+		float: none;
+		display:inline-block;
+		padding-left: 0px;
+		padding-top: 5px;
 	}
 
 	.list-group {
 		padding-top: 10px;
 	}
-}
 
-@media (max-width: 445px){
-	#filter {
-		margin-left: 0px;
-		margin-top: 5px;
-	}
 }
 
 

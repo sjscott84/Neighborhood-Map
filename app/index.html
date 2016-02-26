@@ -17,10 +17,10 @@
 
 	<div id="googleOverlay" class="controls">
 		<div data-bind="visible: showOptions" class="radio">
-			<label><input type="radio" name="whatToDo" value="culture" data-bind="checked: catagory">Culture</label><br>
-			<label><input type="radio" name="whatToDo" value="amusement" data-bind="checked: catagory">Amusement</label><br>
-			<label><input type="radio" name="whatToDo" value="outdoors" data-bind="checked: catagory">Outdoor Pursuits</label><br>
-			<label><input type="radio" name="whatToDo" value="animals" data-bind="checked: catagory">Animals</label><br>
+			<label id="radioOptions"><input type="radio" name="whatToDo" value="culture" data-bind="checked: catagory">Culture</label>
+			<label id="radioOptions"><input type="radio" name="whatToDo" value="amusement" data-bind="checked: catagory">Amusement</label>
+			<label id="radioOptions"><input type="radio" name="whatToDo" value="outdoors" data-bind="checked: catagory">Outdoor Pursuits</label>
+			<label id="radioOptions"><input type="radio" name="whatToDo" value="animals" data-bind="checked: catagory">Animals</label><br>
 			<button data-bind="click: seePlaces" type="button" class="btn btn-default center-block">Get Places to See!</button>
 		</div>
 
@@ -41,20 +41,22 @@
 
 		<div id="legend" data-bind="visible: showLegend">
 
-			<span data-bind="visible: showLegend">
-				<button data-bind="click: showOptionsAgain" id="back-button" type="button" class="btn btn-default btn-xs">
-				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-				</button><br>
-			</span>
 
-			<div data-bind="visible: showTextFilter">
-				<h4>Filter display by name:</h4>
-				<input data-bind="value: textFilter, valueUpdate: 'afterkeydown'"></input>
-			</div>
+				<span id="back-button" data-bind="visible: showLegend">
+					<button id="back-button-button"data-bind="click: showOptionsAgain" type="button" class="btn btn-default btn-xs">
+					<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+					</button>
+				</span>
+<div id="filters">
+				<div id="textFilter" data-bind="visible: showTextFilter">
+					<h4>Filter display by name:</h4>
+					<input data-bind="value: textFilter, valueUpdate: 'afterkeydown'"></input>
+				</div>
 
-			<div data-bind="visible: showDropdownFilter">
-				<h4 id="filter-title" data-bind="visible:showLegend"> Or filter by type:</h4>
-				<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter() }"></select>
+				<div id="dropdownFilter" data-bind="visible: showDropdownFilter">
+					<h4 data-bind="visible:showLegend"> Or filter by type:</h4>
+					<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter() }"></select>
+				</div>
 			</div>
 
 			<ul class="list-group" data-bind="foreach: filterPlaces, visible:showFilter">
