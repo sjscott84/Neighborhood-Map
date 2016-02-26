@@ -405,7 +405,7 @@ var ViewModel = function(){
 					view.listView()[i].marker.setAnimation(null);
 				}
 			}
-			
+
 			self.currentPlace().marker.setAnimation(google.maps.Animation.BOUNCE);
 
 			self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker,
@@ -521,7 +521,6 @@ var ViewModel = function(){
 	 */
 	self.changeMarkerBack = function (){
 		if(map){
-			self.currentPlace("");
 			for (var i = 0; i<view.listView().length; i++){
 				if(view.listView()[i].marker.icon === 'http://www.googlemapsmarkers.com/v1/B/FF0000'){
 					view.listView()[i].marker.setIcon('http://www.googlemapsmarkers.com/v1/'+view.listView()[i].label+'/'+view.listView()[i].iconColor);
@@ -644,6 +643,7 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.showDetailedDirections = function (){
+		self.selectedMarker.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		self.showLegend(false);
 		self.showDirections(true);
 	};
@@ -653,6 +653,7 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.showFullLegend = function (){
+		self.changeMarkerBack();
 		self.showDirections(false);
 		self.showLegend(true);
 	};
@@ -749,6 +750,8 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.showInfo = function (where, marker, rating, what, url, distance, duration){
+
+		view.selectedMarker = marker;
 		var contentStringYelp = '<b>'+where+'</b>'+'<br>Category: '+what+'<br>Yelp Rating: '+rating
 		+'<br><a href="'+url+'" target="_blank">Go to Yelp Reviews</a><br>Walk Time: '+distance+' about '+duration
 		+'<br><button type="button" class="btn btn-default center-block" onclick="view.showDetailedDirections()">Show Directions!</button>';
