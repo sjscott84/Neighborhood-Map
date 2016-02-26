@@ -16,13 +16,18 @@
 	<input id="pac-input" class="controls" type="text" placeholder="Enter Starting Location Here">
 
 	<div id="googleOverlay" class="controls">
+
 		<div data-bind="visible: showOptions" class="radio">
 			<label id="radioOptions"><input type="radio" name="whatToDo" value="culture" data-bind="checked: catagory">Culture</label>
 			<label id="radioOptions"><input type="radio" name="whatToDo" value="amusement" data-bind="checked: catagory">Amusement</label>
 			<label id="radioOptions"><input type="radio" name="whatToDo" value="outdoors" data-bind="checked: catagory">Outdoor Pursuits</label>
 			<label id="radioOptions"><input type="radio" name="whatToDo" value="animals" data-bind="checked: catagory">Animals</label><br>
+
 			<button data-bind="click: seePlaces" type="button" class="btn btn-default center-block">Get Places to See!</button>
+
 		</div>
+
+		<i id="loading" data-bind="visible: loading" id="weatherLoad" class='fa fa-spinner fa-pulse fa-3x'></i>
 
 		<div data-bind="visible: showForecast" id="weather" class="table">
 			<h4>12 Hour Weather Forecast</h4>

@@ -10,6 +10,7 @@ var map,
 	labelIndex = 0,
 	vicinity,
 	cll,
+	fromLocalStorage = false,
 	initialLocation;
 
 /**
@@ -35,7 +36,7 @@ function initMap(){
 
 	infowindow = new google.maps.InfoWindow;
 
-	localStorage.clear();
+	//localStorage.clear();
 
 	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
@@ -55,6 +56,7 @@ function initMap(){
 		map.setZoom(14);
 		map.setCenter(view.listView()[0].position);
 		view.showResults();
+		fromLocalStorage = true;
 	}
 
 	//Clear error handling setTimout once all tiles have loaded
@@ -141,7 +143,9 @@ var ViewModel = function(){
 		searchBox,
 		places,
 		directionsDisplay,
-		directionsService;
+		directionsService,
+		stateForWeather,
+		cityForWeather;
 
 	self.showOptions = ko.observable(true);
 	self.showForecast = ko.observable(false);
@@ -159,6 +163,7 @@ var ViewModel = function(){
 	self.weatherLoad = ko.observable(true);
 	self.catagory = ko.observable();
 	self.selectedPlace = ko.observable();
+	self.loading = ko.observable(false);
 
 	//this functionality turned off to meet project requirement for search capabilities
 	/**
@@ -264,8 +269,6 @@ var ViewModel = function(){
 				var name = place.name;
 				var position = place.geometry.location;
 				var weatherPlace = place.address_components;
-				var stateForWeather;
-				var cityForWeather;
 				vicinity = place.formatted_address;
 				cll = place.geometry.location.lat()+','+place.geometry.location.lng();
 				initialLocation = new google.maps.LatLng(place.geometry.location.lat(),place.geometry.location.lng());
@@ -305,7 +308,7 @@ var ViewModel = function(){
 				map.fitBounds(bounds);
 				//map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
-				//getWeather(stateForWeather, cityForWeather);
+				getWeather(stateForWeather, cityForWeather);
 			});
 		});
 	};
@@ -340,6 +343,10 @@ var ViewModel = function(){
 		if(!self.listView()[0]){
 			alert("Please enter a starting location");
 		}else{
+			self.showOptions(false);
+			self.showForecast(false);
+			self.loading(true);
+
 			var forSearchYelp;
 			var forSearchGoogle = [];
 				var input = self.catagory();
@@ -492,6 +499,7 @@ var ViewModel = function(){
 
 		self.setDataTypeArray(self.listView());
 		self.fitBoundsToVisibleMarkers()
+		self.loading(false);
 
 	};
 
@@ -685,6 +693,10 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.showOptionsAgain = function (){
+		if(fromLocalStorage === true){
+			getWeather(stateForWeather, cityForWeather);
+		}
+
 		map.setCenter(initialLocation);
 		map.setZoom(14);
 		if (self.listView().length > 1){
@@ -789,6 +801,9 @@ var ViewModel = function(){
 
 		localStorage.setItem("results", JSON.stringify(infoToSave));
 		localStorage.setItem("initialLocation", JSON.stringify(initialLocation));
+		localStorage.setItem("stateWeather", JSON.stringify(stateForWeather));
+		localStorage.setItem("cityWeather", JSON.stringify(cityForWeather));
+
 	};
 
 	/**
@@ -801,6 +816,8 @@ var ViewModel = function(){
 		var resultsToUse = JSON.parse(resultsFromLocalStorage);
 		var initLocation = localStorage.getItem("initialLocation");
 		initialLocation = JSON.parse(initLocation);
+		stateForWeather = localStorage.getItem("stateWeather");
+		cityForWeather = localStorage.getItem("cityWeather")
 		labels[labelIndex=0];
 
 		self.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);
