@@ -45,14 +45,13 @@
 		</div>
 
 		<div id="legend" data-bind="visible: showLegend">
-
-
-				<span id="back-button" data-bind="visible: showLegend">
-					<button id="back-button-button"data-bind="click: showOptionsAgain" type="button" class="btn btn-default btn-xs">
+			<span id="back-button" data-bind="visible: showLegend">
+				<button id="back-button-button"data-bind="click: showOptionsAgain" type="button" class="btn btn-default btn-xs">
 					<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
-					</button>
-				</span>
-<div id="filters">
+				</button>
+			</span>
+
+			<div id="filters">
 				<div id="textFilter" data-bind="visible: showTextFilter">
 					<h4>Filter display by name:</h4>
 					<input data-bind="value: textFilter, valueUpdate: 'afterkeydown'"></input>
@@ -67,7 +66,6 @@
 			<ul class="list-group" data-bind="foreach: filterPlaces, visible:showFilter">
 				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace, css: {selectedItem: $root.selectedPlace() === $data}"></li>
 			</ul>
-
 		</div>
 
 		<div id="directionsPanel" data-bind="visible: showDirections">

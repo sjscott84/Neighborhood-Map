@@ -114,6 +114,9 @@ function getMarkerColor (catagory){
 		case 'Dog Parks':
 			iconColor = '993300';
 			break;
+		case 'Botanical Gardens':
+			iconColor = 'ffcccc';
+			break;
 		default:
 			iconColor = 'ff0000';
 	}

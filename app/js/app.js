@@ -491,6 +491,9 @@ var ViewModel = function(){
 		//if no yelp results match search catagory return error message else save results to local storage
 		if(self.listView().length === 1){
 			alert("There are no results that match your search, try a new catagory");
+			self.loading(false);
+			self.showOptions(true);
+			self.showForecast(true);
 		}else{
 			self.showResults();
 			localStorage.clear();
@@ -550,6 +553,8 @@ var ViewModel = function(){
 			directionsDisplay.setMap(null);
 			directionsDisplay.setPanel(null);
 		}
+		self.selectedPlace("");
+		self.currentPlace("");
 	};
 
 	/**
@@ -589,14 +594,14 @@ var ViewModel = function(){
 		if(self.currentFilter() === "All"){
 			self.showTextFilter(true);
 			self.removeDirections();
-			self.fitBoundsToVisibleMarkers();
+			//self.fitBoundsToVisibleMarkers();
 			for(var i = 0; i<self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
 			}
 		}else{
 			self.removeDirections();
 			self.showTextFilter(false);
-			self.fitBoundsToVisibleMarkers();
+			//self.fitBoundsToVisibleMarkers();
 			for (var i = 1; i < self.listView().length; i++) {
 				if(self.listView()[i].what !== self.currentFilter()){
 					self.listView()[i].marker.setMap(null);
@@ -605,6 +610,7 @@ var ViewModel = function(){
 				}
 			}
 		}
+		self.fitBoundsToVisibleMarkers();
 	});
 
 	/**
@@ -612,7 +618,7 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.textFilterResults = ko.computed( function () {
-		if(!self.textFilter()){
+		if(self.textFilter() === ""){
 			self.showDropdownFilter(true);
 			self.removeDirections();
 			self.fitBoundsToVisibleMarkers();
@@ -622,7 +628,7 @@ var ViewModel = function(){
 		}else{
 			self.showDropdownFilter(false);
 			self.removeDirections();
-			self.fitBoundsToVisibleMarkers();
+			//self.fitBoundsToVisibleMarkers();
 			var filter = self.textFilter().toLowerCase();
 
 			for(var i = 1; i < self.listView().length; i++){
@@ -633,7 +639,7 @@ var ViewModel = function(){
 				}
 			}
 		}
-		//self.fitBoundsToVisibleMarkers();
+		self.fitBoundsToVisibleMarkers();
 	});
 
 	/**
