@@ -111,14 +111,25 @@ var Place = function(name, position, rating, what, url){
 		icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
-		view.changeMarkerBack();
-		this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
+		//this.setAnimation(google.maps.Animation.BOUNCE);
+		//view.changeMarkerBack();
+		//this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
+		toggleBounce();
 		view.showFullLegend();
 		view.getDirections(position, name, this, rating, what, url);
 		view.setPlace(self);
 	});
 
 	self.listName = self.label+" - "+name;
+
+	function toggleBounce() {
+		for (var i = 0; i < view.listView().length; i++){
+			if(view.listView()[i].marker.getAnimation() !== null){
+				view.listView()[i].marker.setAnimation(null);
+			}
+		}
+		self.marker.setAnimation(google.maps.Animation.BOUNCE);
+	}
 };
 
 /**
@@ -388,9 +399,18 @@ var ViewModel = function(){
 		if(clickedPlace !== self.listView()[0]){
 			self.currentPlace(clickedPlace);
 			self.showFullLegend();
+
+			for (var i = 0; i < view.listView().length; i++){
+				if(view.listView()[i].marker.getAnimation() !== null){
+					view.listView()[i].marker.setAnimation(null);
+				}
+			}
+			
+			self.currentPlace().marker.setAnimation(google.maps.Animation.BOUNCE);
+
 			self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker,
 			self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
-			self.currentPlace().marker.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
+			//self.currentPlace().marker.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		}
 	};
 
@@ -530,9 +550,8 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.filterPlaces = ko.computed(function() {
-		//if(self.currentPlace()){
-			self.selectedPlace(self.currentPlace());
-		//}
+		//Highlight clicked list item
+		self.selectedPlace(self.currentPlace());
 		//If both filters at starting point
 		if(self.currentFilter() === "All" && !self.textFilter()){
 			return self.listView();
