@@ -63,6 +63,10 @@ html, body {
 	background-color: #ff0;
 }
 
+.notSelectedItem {
+	background-color: white;
+}
+
 #pac-input:focus {
 	border-color: #4d90fe;
 }

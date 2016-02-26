@@ -106,16 +106,12 @@ var Place = function(name, position, rating, what, url){
 		map: map,
 		title: name,
 		position: this.position,
-		//label: labels[labelIndex++ % labels.length],
 		zoomOnClick: false,
 		icon: 'http://www.googlemapsmarkers.com/v1/'+this.label+'/'+this.iconColor
-		//animation: google.maps.Animation.DROP
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		view.changeMarkerBack();
 		this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
-		//this.icon = 'http://www.googlemapsmarkers.com/v1/'+this.label+'/FF0000',
-		//this.icon = 'http://maps.gstatic.com/mapfiles/markers2/marker_green'+this.label+'.png';
 		view.showFullLegend();
 		view.getDirections(position, name, this, rating, what, url);
 
@@ -149,6 +145,8 @@ var ViewModel = function(){
 	self.showTextFilter = ko.observable(true);
 	self.showDropdownFilter = ko.observable(true);
 	self.weatherLoad = ko.observable(true);
+	self.catagory = ko.observable();
+	self.selectedPlace = ko.observable();
 
 	//this functionality turned off to meet project requirement for search capabilities
 	/**
@@ -332,8 +330,7 @@ var ViewModel = function(){
 		}else{
 			var forSearchYelp;
 			var forSearchGoogle = [];
-			$('input[name="whatToDo"]:checked').each(function(){
-				var input = this.value;
+				var input = self.catagory();
 				switch (input) {
 					case 'outdoors':
 						forSearchGoogle = ['park', 'zoo'];
@@ -353,7 +350,6 @@ var ViewModel = function(){
 						break;
 				}
 				yelpHell(forSearchYelp, vicinity, cll, forSearchGoogle, view);
-			});
 		}
 	};
 
@@ -532,6 +528,9 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.filterPlaces = ko.computed(function() {
+		if(self.currentPlace()){
+			self.selectedPlace(self.currentPlace());
+		}
 		//If both filters at starting point
 		if(self.currentFilter() === "All" && !self.textFilter()){
 			return self.listView();
