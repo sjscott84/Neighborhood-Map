@@ -94,30 +94,31 @@ var StartPlace = function(name, position, vicinity){
  * @param {url} url - The URL to the yelp page of place (only supplied when info comes from yelp api and not google api)
  */
 var Place = function(name, position, rating, what, url){
-	this.map = map;
-	this.name = name;
-	this.position = position;
-	this.rating = rating;
-	this.what = what;
-	this.url = url;
-	this.iconColor = getMarkerColor(this.what);
-	this.label = labels[labelIndex++ % labels.length];
-	this.marker = new google.maps.Marker({
+	var self = this;
+	self.map = map;
+	self.name = name;
+	self.position = position;
+	self.rating = rating;
+	self.what = what;
+	self.url = url;
+	self.iconColor = getMarkerColor(this.what);
+	self.label = labels[labelIndex++ % labels.length];
+	self.marker = new google.maps.Marker({
 		map: map,
 		title: name,
-		position: this.position,
+		position: self.position,
 		zoomOnClick: false,
-		icon: 'http://www.googlemapsmarkers.com/v1/'+this.label+'/'+this.iconColor
+		icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		view.changeMarkerBack();
 		this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		view.showFullLegend();
 		view.getDirections(position, name, this, rating, what, url);
-
+		view.setPlace(self);
 	});
 
-	this.listName = this.label+" - "+name;
+	self.listName = self.label+" - "+name;
 };
 
 /**
@@ -500,6 +501,7 @@ var ViewModel = function(){
 	 */
 	self.changeMarkerBack = function (){
 		if(map){
+			self.currentPlace("");
 			for (var i = 0; i<view.listView().length; i++){
 				if(view.listView()[i].marker.icon === 'http://www.googlemapsmarkers.com/v1/B/FF0000'){
 					view.listView()[i].marker.setIcon('http://www.googlemapsmarkers.com/v1/'+view.listView()[i].label+'/'+view.listView()[i].iconColor);
@@ -528,9 +530,9 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.filterPlaces = ko.computed(function() {
-		if(self.currentPlace()){
+		//if(self.currentPlace()){
 			self.selectedPlace(self.currentPlace());
-		}
+		//}
 		//If both filters at starting point
 		if(self.currentFilter() === "All" && !self.textFilter()){
 			return self.listView();
