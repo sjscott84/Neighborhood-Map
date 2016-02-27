@@ -36,8 +36,6 @@ function initMap(){
 
 	infowindow = new google.maps.InfoWindow;
 
-	//localStorage.clear();
-
 	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
 
@@ -113,9 +111,6 @@ var Place = function(name, position, rating, what, url){
 		icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
-		//this.setAnimation(google.maps.Animation.BOUNCE);
-		//view.changeMarkerBack();
-		//this.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		toggleBounce();
 		view.showFullLegend();
 		view.getDirections(position, name, this, rating, what, url);
@@ -124,6 +119,7 @@ var Place = function(name, position, rating, what, url){
 
 	self.listName = self.label+" - "+name;
 
+	//Bouce the marker on click
 	function toggleBounce() {
 		for (var i = 0; i < view.listView().length; i++){
 			if(view.listView()[i].marker.getAnimation() !== null){
@@ -274,24 +270,27 @@ var ViewModel = function(){
 				initialLocation = new google.maps.LatLng(place.geometry.location.lat(),place.geometry.location.lng());
 
 				//get state or country for weather search
-				for(var i = 0; i < weatherPlace.length; i++){
-					if(weatherPlace[i].types[0] === "country"){
-						if(weatherPlace[i].short_name === "US"){
-							for(var j = 0; j < weatherPlace.length; j++){
-								if(weatherPlace[j].types[0] === "administrative_area_level_1"){
-									stateForWeather = weatherPlace[j].short_name;
+				if(weatherPlace){
+					for(var i = 0; i < weatherPlace.length; i++){
+						if(weatherPlace[i].types[0] === "country"){
+							if(weatherPlace[i].short_name === "US"){
+								for(var j = 0; j < weatherPlace.length; j++){
+									if(weatherPlace[j].types[0] === "administrative_area_level_1"){
+										stateForWeather = weatherPlace[j].short_name;
+									}
 								}
+							}else{
+								stateForWeather = weatherPlace[i].long_name;
 							}
-						}else{
-							stateForWeather = weatherPlace[i].long_name;
 						}
 					}
-				}
 
-				//get city for weather search
-				for(var j = 0; j < weatherPlace.length; j++){
-					if(weatherPlace[j].types[0] === "locality"){
-						cityForWeather = weatherPlace[j].long_name;
+
+					//get city for weather search
+					for(var j = 0; j < weatherPlace.length; j++){
+						if(weatherPlace[j].types[0] === "locality"){
+							cityForWeather = weatherPlace[j].long_name;
+						}
 					}
 				}
 
@@ -306,22 +305,32 @@ var ViewModel = function(){
 
 				map.setCenter(initialLocation);
 				map.fitBounds(bounds);
-				//map.setZoom(14);
 				bounds = new google.maps.LatLngBounds();
 				getWeather(stateForWeather, cityForWeather);
 			});
 		});
 	};
 
-	self.showWeather = function(currentCondition, currentTemp, currentIcon, forcastCondition, forecastTime, forcastIcon, forcastTemp){
+	/**
+	 * Display the weather from data returned from getWeather function
+	 * @param {string} currentCondition - The current weather condition
+	 * @param {string} currentTemp - The current temperature in farenheit
+	 * @param {url} currentIcon - Link to an image relating to the current weather condition
+	 * @param {array} forecastCondition - An array of string values for the weather condition for the next 12 hours
+	 * @param {array} forecastTime - An array of string values for the hour values for the next 12 hours
+	 * @param {array} forecastIcon- An array of urls for the icon relating to the weather condition for the next 12 hours
+	 * @param {array} forecastTemp - An array of string values for the temperature for the next 12 hours
+	 * @memberof ViewModel
+	 */
+	self.showWeather = function(currentCondition, currentTemp, currentIcon, forecastCondition, forecastTime, forecastIcon, forecastTemp){
 
 		var currentCondition = currentCondition;
 		var currentTemp = currentTemp;
 		var currentIcon = currentIcon;
-		var forecastCondition = forcastCondition;
+		var forecastCondition = forecastCondition;
 		var forecastTime = forecastTime;
-		var forecastIcon = forcastIcon;
-		var forecastTemp = forcastTemp;
+		var forecastIcon = forecastIcon;
+		var forecastTemp = forecastTemp;
 
 		self.showForecast(true);
 
@@ -417,7 +426,6 @@ var ViewModel = function(){
 
 			self.getDirections(self.currentPlace().position, self.currentPlace().name, self.currentPlace().marker,
 			self.currentPlace().rating, self.currentPlace().what, self.currentPlace().url);
-			//self.currentPlace().marker.setIcon('http://www.googlemapsmarkers.com/v1/B/FF0000');
 		}
 	};
 
@@ -470,13 +478,13 @@ var ViewModel = function(){
 	self.displayPlaces = function (){
 		//adds google results to view.listView() if no yelp results
 		if(yelpData === undefined || jQuery.isEmptyObject(yelpData)){
-			for(var j = 0; j<googleData.length; j++){
+			for(var j = 0; j < googleData.length; j++){
 				self.addPlace(googleData[j].name, googleData[j].position, googleData[j].rating, googleData[j].type);
 			}
 		}else{
 			//adds yelp info to view.listView() if rating is over 3.5 and is open
 			var yelp = yelpData.businesses;
-			for(var i = 0; i<yelp.length; i++){
+			for(var i = 0; i < yelp.length; i++){
 				if(yelp[i].rating >= 3.5){
 					try{
 						var yelpLoc = new google.maps.LatLng(yelp[i].location.coordinate.latitude,yelp[i].location.coordinate.longitude);
@@ -594,14 +602,12 @@ var ViewModel = function(){
 		if(self.currentFilter() === "All"){
 			self.showTextFilter(true);
 			self.removeDirections();
-			//self.fitBoundsToVisibleMarkers();
 			for(var i = 0; i<self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
 			}
 		}else{
 			self.removeDirections();
 			self.showTextFilter(false);
-			//self.fitBoundsToVisibleMarkers();
 			for (var i = 1; i < self.listView().length; i++) {
 				if(self.listView()[i].what !== self.currentFilter()){
 					self.listView()[i].marker.setMap(null);
@@ -621,14 +627,12 @@ var ViewModel = function(){
 		if(self.textFilter() === ""){
 			self.showDropdownFilter(true);
 			self.removeDirections();
-			self.fitBoundsToVisibleMarkers();
 			for(var i = 1; i < self.listView().length; i++){
 				self.listView()[i].marker.setMap(map);
 			}
 		}else{
 			self.showDropdownFilter(false);
 			self.removeDirections();
-			//self.fitBoundsToVisibleMarkers();
 			var filter = self.textFilter().toLowerCase();
 
 			for(var i = 1; i < self.listView().length; i++){
@@ -792,7 +796,7 @@ var ViewModel = function(){
 	};
 
 	/**
-	 * Save the current starting place and place results to local storage
+	 * Save the current starting place, state and city weather info, and place results to local storage
 	 * @memberof ViewModel
 	 */
 	self.saveInfo = function (){

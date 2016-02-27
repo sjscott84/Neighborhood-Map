@@ -53,12 +53,12 @@
 
 			<div id="filters">
 				<div id="textFilter" data-bind="visible: showTextFilter">
-					<h4>Filter display by name:</h4>
+					<h4>Filter by name:</h4>
 					<input data-bind="value: textFilter, valueUpdate: 'afterkeydown'"></input>
 				</div>
 
 				<div id="dropdownFilter" data-bind="visible: showDropdownFilter">
-					<h4 data-bind="visible:showLegend"> Or filter by type:</h4>
+					<h4 data-bind="visible:showLegend"> Or by type:</h4>
 					<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter() }"></select>
 				</div>
 			</div>

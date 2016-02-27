@@ -19,6 +19,7 @@ function yelpHell (what, where, position, getGoogle, viewModel){
 	var yelpError = setTimeout(function(){
 		alert("Yelp is currently unavailable, results will come from Google")
 		viewModel.findThings(getGoogle);
+		yelpData = {};
 		return;
 	;}, setTimeoutTime);
 

@@ -21,6 +21,28 @@ This can be used for anywhere in the world, however, it works best in major citi
 
 No installation needed simply go to http://sjscott84.github.io/Neighborhood-Map/dist
 
+## To Run Application Locally
+
+Clone this github project locally, open app/index.html and project will run.
+
+Gulp has been used for deployment, so is not necessary to run the application but if needed you will need to npm install the following from the command line:
+		"gulp"
+		"gulp-cssnano"
+		"gulp-htmlmin"
+		"gulp-if"
+		"gulp-imagemin"
+		"gulp-uglify"
+		"gulp-useref"
+
+Then within the command line you can then run the following commands:
+		gulp useref
+		gulp uglify
+		gulp images
+
+useref - minifies the javascript and css files
+uglify - minifies the html file
+images - minifies the images
+
 ## Known Issues
 
 The data returned from the Yelp API can be inconsistant.  I found a few times there were places that I would expect to be returned based on my search criteria but were not being returned.  Apparantly the Yelp website and Yelp API use different algorithms so it can be difficult to get exact search results when using the Yelp API.
