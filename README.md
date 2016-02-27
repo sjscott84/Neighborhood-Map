@@ -26,18 +26,18 @@ No installation needed simply go to http://sjscott84.github.io/Neighborhood-Map/
 Clone this github project locally, open app/index.html and project will run.
 
 Gulp has been used for deployment, so is not necessary to run the application but if needed you will need to npm install the following from the command line:
-		"gulp"
-		"gulp-cssnano"
-		"gulp-htmlmin"
-		"gulp-if"
-		"gulp-imagemin"
-		"gulp-uglify"
-		"gulp-useref"
+		"gulp"  
+		"gulp-cssnano"  
+		"gulp-htmlmin"  
+		"gulp-if"  
+		"gulp-imagemin"  
+		"gulp-uglify"  
+		"gulp-useref"  
 
 Then within the command line you can then run the following commands:
-		gulp useref
-		gulp uglify
-		gulp images
+		gulp useref  
+		gulp uglify  
+		gulp images  
 
 useref - minifies the javascript and css files
 uglify - minifies the html file
