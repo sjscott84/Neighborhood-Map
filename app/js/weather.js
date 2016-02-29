@@ -14,7 +14,7 @@ function getWeather (state, city){
 			success : function(parsed_json) {
 				var currentCondition = parsed_json['current_observation']['weather'];
 				var currentIcon = parsed_json['current_observation']['icon_url'];
-				var currentTemp = parsed_json['current_observation']['temp_f']
+				var currentTemp = parsed_json['current_observation']['temp_f'];
 				var forecast = parsed_json['hourly_forecast'];
 				var forecastTime = [];
 				var forecastCondition = [];

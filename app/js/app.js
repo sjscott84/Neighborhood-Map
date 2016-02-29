@@ -101,14 +101,15 @@ var Place = function(name, position, rating, what, url){
 	self.rating = rating;
 	self.what = what;
 	self.url = url;
-	self.iconColor = getMarkerColor(this.what);
-	self.label = labels[labelIndex++ % labels.length];
+	self.icon = getMarker(this.what);
+	//self.label = labels[labelIndex++ % labels.length];
 	self.marker = new google.maps.Marker({
 		map: map,
 		title: name,
 		position: self.position,
 		zoomOnClick: false,
-		icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
+		icon: self.icon
+		//icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		toggleBounce();
@@ -117,7 +118,7 @@ var Place = function(name, position, rating, what, url){
 		view.setPlace(self);
 	});
 
-	self.listName = self.label+" - "+name;
+	self.listName = self.name;
 
 	//Bouce the marker on click
 	function toggleBounce() {
@@ -334,14 +335,14 @@ var ViewModel = function(){
 
 		self.showForecast(true);
 
-		self.weatherTable.push({time: "Now", url: currentIcon, condition: currentCondition+" - "+currentTemp+"F"})
+		self.weatherTable.push({time: "Now", url: currentIcon, condition: currentCondition+" - "+currentTemp+"F"});
 
 		for(var i = 0; i < forecastTime.length; i++){
-			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"})
+			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"});
 		}
 
 		self.weatherLoad(false);
-	}
+	};
 
 	/**
 	 * Defines types for the findThings function to search weather results come from yelp api or google places api
@@ -509,7 +510,7 @@ var ViewModel = function(){
 		}
 
 		self.setDataTypeArray(self.listView());
-		self.fitBoundsToVisibleMarkers()
+		self.fitBoundsToVisibleMarkers();
 		self.loading(false);
 
 	};
@@ -532,7 +533,7 @@ var ViewModel = function(){
 
 			map.fitBounds(bounds);
 		}
-	}
+	};
 
 	/**
 	 * If marker was changed to a red B on click this function changes it back to its original form
@@ -542,11 +543,11 @@ var ViewModel = function(){
 		if(map){
 			for (var i = 0; i<view.listView().length; i++){
 				if(view.listView()[i].marker.icon === 'http://www.googlemapsmarkers.com/v1/B/FF0000'){
-					view.listView()[i].marker.setIcon('http://www.googlemapsmarkers.com/v1/'+view.listView()[i].label+'/'+view.listView()[i].iconColor);
+					view.listView()[i].marker.setIcon(view.listView()[i].icon);
 				}
 			}
 		}
-	}
+	};
 
 	/**
 	 * Remove any directions from screen before change position of markers
@@ -589,7 +590,7 @@ var ViewModel = function(){
 				var result = rec.listName.toLowerCase();
 				if(result.indexOf(filter) > -1){
 					return result;
-				};
+				}
 			});
 		}
 	});
@@ -653,7 +654,7 @@ var ViewModel = function(){
 	 */
 	self.filter = function (genre) {
 		self.currentFilter(genre);
-		self.fitBoundsToVisibleMarkers()
+		self.fitBoundsToVisibleMarkers();
 	};
 
 	/**
@@ -827,7 +828,7 @@ var ViewModel = function(){
 		var initLocation = localStorage.getItem("initialLocation");
 		initialLocation = JSON.parse(initLocation);
 		stateForWeather = localStorage.getItem("stateWeather");
-		cityForWeather = localStorage.getItem("cityWeather")
+		cityForWeather = localStorage.getItem("cityWeather");
 		labels[labelIndex=0];
 
 		self.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);

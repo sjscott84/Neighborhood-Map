@@ -1,124 +1,124 @@
-function getMarkerColor (catagory){
-	var iconColor;
+function getMarker (catagory){
+	var icon;
 	switch (catagory){
 		case 'park':
-			iconColor = '66ffcc';
+			icon = 'images/forest2.png';
 			break;
 		case 'Parks':
-			iconColor = '66ffcc';
+			icon = 'images/forest2.png';
 			break;
 		case 'zoo':
-			iconColor = '330000';
+			icon = 'images/zoo.png';
 			break;
 		case 'Playgrounds':
-			iconColor = '99ccff';
+			icon = 'images/playground.png';
 		case 'Gardens':
-			iconColor = 'ff6600';
+			icon = 'images/flowers.png';
 			break;
 		case 'Farms':
-			iconColor = 'ff6600';
+			icon = 'images/farm-2.png';
 			break;
 		case 'Observatories':
-			iconColor = '330066';
+			icon = 'images/planetarium-2.png';
 			break;
 		case 'Beaches':
-			iconColor = 'ffff00';
+			icon = 'images/beach.png';
 			break;
 		case 'Hiking':
-			iconColor = '6666cc';
+			icon = 'images/hiking.png';
 			break;
 		case 'Horseback Riding':
-			iconColor = 'cc0066';
+			icon = 'images/horseriding.png';
 			break;
 		case 'Skating Rinks':
-			iconColor = 'cc6699';
+			icon = 'images/iceskating.png';
 			break;
 		case 'Swimming Pools':
-			iconColor = '0000ff';
+			icon = 'images/swimming.png';
 			break;
 		case 'Water Parks':
-			iconColor = '000033';
+			icon = 'images/waterpark.png';
 			break;
 		case 'art_gallery':
-			iconColor = '66ffcc';
+			icon = 'images/art-museum-2.png';
 			break;
 		case 'library':
-			iconColor = '000033';
+			icon = 'images/library.png';
 			break;
 		case 'museum':
-			iconColor = '0000ff';
+			icon = 'images/museum_crafts.png';
 			break;
 		case 'Art Galleries':
-			iconColor = '66ffcc';
+			icon = 'images/art-museum-2.png';
 			break;
 		case 'Cultural Center':
-			iconColor = '6666cc';
+			icon = 'images/country.png';
 			break;
 		case 'Museums':
-			iconColor = '0000ff';
+			icon = 'images/museum_crafts.png';
 			break;
 		case 'Planetarium':
-			iconColor = 'cc6699';
+			icon = 'images/planetarium-2.png';
 			break;
 		case 'Wineries':
-			iconColor = 'ffff00';
+			icon = 'images/winebar.png';
 			break;
 		case 'Landmarks & Historical Buildings':
-			iconColor = '99ccff';
+			icon = 'images/landmark.png';
 			break;
 		case 'amusement_park':
-			iconColor = 'ff9933';
+			icon = 'images/themepark.png';
 			break;
 		case 'bowling_alley':
-			iconColor = '66ffcc';
+			icon = 'images/bowling.png';
 			break;
 		case 'Arcades':
-			iconColor = 'cc0066';
+			icon = 'images/videogames.png';
 			break;
 		case 'Haunted Houses':
-			iconColor = '330066';
+			icon = 'images/ghosttown.png';
 			break;
 		case 'Amusement Parks':
-			iconColor = 'ff9933';
+			icon = 'images/themepark.png';
 			break;
 		case 'Carousels':
-			iconColor = 'ffff00';
+			icon = 'images/carousel.png';
 			break;
 		case 'Go Karts':
-			iconColor = '000033';
+			icon = 'images/go-kart.png';
 			break;
 		case 'Mini Golf':
-			iconColor = '99ccff';
+			icon = 'images/golfing.png';
 			break;
 		case 'Skating Rinks':
-			iconColor = 'cc6699';
+			icon = 'images/iceskating.png';
 			break;
 		case 'aquarium':
-			iconColor = '0000ff';
+			icon = 'images/aquarium.png';
 			break;
 		case 'Aquariums':
-			iconColor = '0000ff';
+			icon = 'images/aquarium.png';
 			break;
 		case 'Diving':
-			iconColor = '000033';
+			icon = 'images/scubadiving.png';
 			break;
 		case 'Fishing':
-			iconColor = 'cc6699';
+			icon = 'images/fishing.png';
 			break;
 		case 'Snorkeling':
-			iconColor = 'ffff00';
+			icon = 'images/snorkeling.png';
 			break;
 		case 'Zoos':
-			iconColor = '330000';
+			icon = 'images/zoo.png'
 			break;
 		case 'Dog Parks':
-			iconColor = '993300';
+			icon = 'images/pets.png'
 			break;
 		case 'Botanical Gardens':
-			iconColor = 'ffcccc';
+			icon = 'images/flowers.png';
 			break;
 		default:
-			iconColor = 'ff0000';
+			icon = 'images/undefined.png';
 	}
-	return iconColor;
+	return icon;
 }
