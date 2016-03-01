@@ -13,35 +13,36 @@
 <body>
 
 	<div id="map"></div>
+
 	<input id="pac-input" class="controls" data-bind="value: koSearchBox, valueUpdate: 'afterkeydown'">
 
-	<div id="googleOverlay" class="controls">
+	<div id="google-overlay" class="controls">
 
 		<div data-bind="visible: showOptions" class="radio">
-			<label id="culture"><input type="radio" name="whatToDo" value="culture" data-bind="checked: catagory">Culture</label>
-			<label id="amusement"><input type="radio" name="whatToDo" value="amusement" data-bind="checked: catagory">Amusement</label>
-			<label id="outdoors"><input type="radio" name="whatToDo" value="outdoors" data-bind="checked: catagory">Outdoor Pursuits</label>
-			<label id="animals"><input type="radio" name="whatToDo" value="animals" data-bind="checked: catagory">Animals</label><br>
+			<label class="radio-options"><input type="radio" name="whatToDo" value="culture" data-bind="checked: catagory">Culture</label>
+			<label class="radio-options"><input type="radio" name="whatToDo" value="amusement" data-bind="checked: catagory">Amusement</label>
+			<label class="radio-options"><input type="radio" name="whatToDo" value="outdoors" data-bind="checked: catagory">Outdoor Pursuits</label>
+			<label class="radio-options"><input type="radio" name="whatToDo" value="animals" data-bind="checked: catagory">Animals</label><br>
 
 			<button data-bind="click: seePlaces" type="button" class="btn btn-default center-block">Get Places to See!</button>
 
 		</div>
 
-		<i id="loadingInfo" data-bind="visible: loading" class="fa fa-spinner fa-pulse fa-3x"></i>
+		<i data-bind="visible: loading" class="fa fa-spinner fa-pulse fa-3x, loading"></i>
 
 		<div data-bind="visible: showForecast" id="weather" class="table">
 			<h4>12 Hour Weather Forecast</h4>
-			<i id="loadingWeather" data-bind="visible: weatherLoad" class="fa fa-spinner fa-pulse"></i>
+			<i data-bind="visible: weatherLoad" class="fa fa-spinner fa-pulse, loading"></i>
 			<table>
 				<tbody data-bind="foreach: weatherTable">
 					<tr>
 						<td id="time" data-bind="text: $data.time"></td>
-						<td id="url"><img class="weatherImage" data-bind="attr:{src: $data.url}" alt="Weather Icon"></td>
+						<td id="url"><img class="weather-image" data-bind="attr:{src: $data.url}" alt="Weather Icon"></td>
 						<td id="conditions" data-bind="text: $data.condition"></td>
 					</tr>
 				</tbody>
 			</table>
-			<img id="weatherLogo" src="images/wundergroundLogo_4c_horz.jpg" alt="Weather Underground logo">
+			<img id="weather-logo" src="images/wundergroundLogo_4c_horz.jpg" alt="Weather Underground logo">
 		</div>
 
 		<div id="legend" data-bind="visible: showLegend">
@@ -52,23 +53,23 @@
 			</span>
 
 			<div id="filters">
-				<div id="textFilter" data-bind="visible: showTextFilter">
+				<div id="text-filter" data-bind="visible: showTextFilter">
 					<h4>Filter by name:</h4>
 					<input data-bind="value: textFilter, valueUpdate: 'afterkeydown'">
 				</div>
 
-				<div id="dropdownFilter" data-bind="visible: showDropdownFilter">
+				<div id="dropdown-filter" data-bind="visible: showDropdownFilter">
 					<h4 data-bind="visible:showLegend"> Or by type:</h4>
 					<select id="filter" data-bind="options:dataType, value:currentFilter, visible:showFilter, click: function() { filter() }"></select>
 				</div>
 			</div>
 
 			<ul class="list-group" data-bind="foreach: filterPlaces, visible:showFilter">
-				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace, css: {selectedItem: $root.selectedPlace() === $data}"></li>
+				<li class="list-group-item" data-bind="text: $data.listName, click: $root.setPlace, css: {selected_item: $root.selectedPlace() === $data}"></li>
 			</ul>
 		</div>
 
-		<div id="directionsPanel" data-bind="visible: showDirections">
+		<div id="directions-panel" data-bind="visible: showDirections">
 			<button data-bind="click: showFullLegend, visible: showDirections" id="back-button-directions" type="button" class="btn btn-default btn-xs">
 				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
 			</button>

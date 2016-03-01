@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
@@ -11,6 +12,20 @@ html, body {
 
 #info {
 	background-color: #333;
+}
+
+#google-overlay {
+	background-color: #fff;
+	font-family: Roboto;
+	font-size: 15px;
+	font-weight: 300;
+	width: 275px;
+	height: 80%;
+	margin-top: 12px;
+	margin-left: 12px;
+	padding-left: 10px;
+	padding-right: 10px;
+	overflow-y: scroll;
 }
 
 #back-button-button {
@@ -47,15 +62,11 @@ html, body {
 	width: 275px;
 }
 
-.selectedItem {
+.selected_item {
 	border-style: solid;
 	border-width: 5px;
 	border-color: black;
 	font-weight: bold;
-}
-
-.notSelectedItem {
-	background-color: white;
 }
 
 #pac-input:focus {
@@ -66,33 +77,21 @@ html, body {
 	font-family: Roboto;
 }
 
-#culture {
-	display: block;
-}
-
-#amusement {
-	display: block;
-}
-
-#outdoors {
-	display: block;
-}
-
-#animals {
+.radio-options {
 	display: block;
 }
 
 #type-selector {
 	color: #fff;
 	background-color: #4d90fe;
-	padding: 5px 11px 0px 11px;
+	padding: 5px 11px 0 11px;
 }
 
-#textFilter {
+#text-filter {
 	padding-top: 5px;
 }
 
-#dropdownFilter {
+#dropdown-filter {
 	padding-top: 5px;
 }
 
@@ -102,26 +101,7 @@ html, body {
 	font-weight: 300;
 }
 
-#googleOverlay {
-	background-color: #fff;
-	font-family: Roboto;
-	font-size: 15px;
-	font-weight: 300;
-	width: 275px;
-	height: 80%;
-	margin-top: 12px;
-	margin-left: 12px;
-	padding-left: 10px;
-	padding-right: 10px;
-	overflow-y: scroll;
-}
-
-#loadingWeather {
-	margin-left: 40%;
-	margin-top: 10px;
-}
-
-#loadingInfo {
+.loading {
 	margin-left: 40%;
 	margin-top: 10px;
 }
@@ -130,7 +110,7 @@ html, body {
 	display: table;
 }
 
-.weatherImage {
+.weather-image {
 	width: 30px;
 	height: 30px;
 }
@@ -149,13 +129,13 @@ html, body {
 	width: 148px;
 }
 
-#weatherLogo {
+#weather-logo {
 	width: 154px;
 	height: 36px;
 }
 
-@media (max-width: 600px){
-	#googleOverlay {
+@media (max-width: 600px) {
+	#google-overlay {
 		width: 90%;
 		height: 25%;
 		margin-bottom: 12px;
@@ -166,65 +146,47 @@ html, body {
 		float: left;
 	}
 
-	#textFilter {
+	#text-filter {
 		float: left;
 		padding-left: 10px;
-		padding-top: 0px;
+		padding-top: 0;
 	}
 
-	#dropdownFilter {
+	#dropdown-filter {
 		float: left;
 		padding-left: 20px;
-		padding-top: 0px;
+		padding-top: 0;
 	}
 
 	.list-group {
 		padding-top: 80px;
 	}
 
-	#culture {
-		display: inline-block;
-		padding-right: 5px;
-		padding-bottom: 5px;
-	}
-
-	#amusement {
-		display: inline-block;
-		padding-right: 5px;
-		padding-bottom: 5px;
-	}
-
-	#outdoors {
-		display: inline-block;
-		padding-right: 5px;
-		padding-bottom: 5px;
-	}
-
-	#animals {
+	.radio-options {
 		display: inline-block;
 		padding-right: 5px;
 		padding-bottom: 5px;
 	}
 }
 
-@media (max-width: 510px){
+@media (max-width: 510px) {
 
 	#back-button {
 		float: none;
-		display:inline-block;
+		display: inline-block;
 	}
 
-	#dropdownFilter {
+	#dropdown-filter {
 		float: none;
-		display:inline-block;
-		padding-left: 0px;
+		display: inline-block;
+		padding-left: 0;
 		padding-top: 5px;
 	}
 
-	#textFilter {
+	#text-filter {
 		float: none;
-		display:inline-block;
-		padding-left: 0px;
+		display: inline-block;
+		padding-left: 0;
 		padding-top: 5px;
 	}
 

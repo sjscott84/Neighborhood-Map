@@ -117,6 +117,9 @@ function getMarker (catagory){
 		case 'Botanical Gardens':
 			icon = 'images/flowers.png';
 			break;
+		case 'Wine Tasting Room':
+			icon = 'images/winebar.png';
+			break;
 		default:
 			icon = 'images/undefined.png';
 	}

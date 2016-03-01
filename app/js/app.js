@@ -5,7 +5,7 @@ var map,
 	infowindow,
 	yelpData,
 	googleData = [],
-	overlay = document.getElementById('googleOverlay'),
+	overlay = document.getElementById('google-overlay'),
 	labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ',
 	labelIndex = 0,
 	vicinity,
@@ -27,7 +27,6 @@ function initMap(){
 
 	infowindow = new google.maps.InfoWindow();
 
-	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
 
 	//Adds legend to different part of screen depending on screen size
@@ -49,7 +48,9 @@ function initMap(){
 	}
 }
 
-//Error if map does not load
+/**
+ * Error if map does not load
+ */
 function onLoadError(){
 	alert("Google is currently unavaliable, please try again later");
 }
@@ -153,64 +154,6 @@ var ViewModel = function(){
 	self.selectedPlace = ko.observable();
 	self.loading = ko.observable(false);
 
-	//this functionality turned off to meet project requirement for search capabilities
-	/**
-	 * Use W3C Geolocation to find users current position
-	 * @memberof ViewModel
-	 */
-	self.findLocation = function(){
-		var browserSupportFlag =  new Boolean();
-		var initialLocation;
-		var geocoder = new google.maps.Geocoder();
-
-		directionsDisplay = new google.maps.DirectionsRenderer();
-		directionsService = new google.maps.DirectionsService();
-
-		// Try W3C Geolocation (Preferred)
-		if(navigator.geolocation) {
-			browserSupportFlag = true;
-			navigator.geolocation.getCurrentPosition(function(position) {
-				cll = position.coords.latitude+','+position.coords.longitude;
-				initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-				map.setCenter(initialLocation);
-				geocodeLatLng(initialLocation);
-				self.addStartPlace("Starting Point", initialLocation, vicinity);
-			}, function() {
-				handleNoGeolocation(browserSupportFlag);
-			});
-		}
-		// If browser doesn't support Geolocation
-		else {
-			browserSupportFlag = false;
-			handleNoGeolocation(browserSupportFlag);
-		}
-		// Handle erros
-		function handleNoGeolocation(errorFlag) {
-			if (errorFlag === true) {
-				alert("Geolocation service failed, enter your starting location in the search field in the map");
-				map.setCenter(startPoint);
-			} else {
-				alert("Geolocation service failed, enter your starting location in the search field in the map");
-				map.setCenter(startPoint);
-			}
-		}
-
-		function geocodeLatLng(where){
-			var latlng = where;
-			geocoder.geocode({'location': latlng}, function(results, status){
-				if (status === google.maps.GeocoderStatus.OK) {
-					if (results[1]) {
-						vicinity = results[1].formatted_address;
-					} else {
-					window.alert('No results found');
-					}
-				} else {
-					window.alert('Geocoder failed due to: ' + status);
-				}
-			});
-		}
-	};
-
 	/**
 	 * Search box, used to find starting point for place searches if unable to use geolocation
 	 * @memberof ViewModel
@@ -235,24 +178,26 @@ var ViewModel = function(){
 		// retrieves more details for that place.
 		searchBox.addListener('places_changed', function() {
 			places = searchBox.getPlaces();
+
 			if (places.length === 0) {
 				return;
 			}
-			//if (self.listView().length > 0){
-				for (var i = 0; i < self.listView().length; i++) {
-					self.listView()[i].marker.setMap(null);
-				}
-				directionsDisplay.setMap(null);
-				directionsDisplay.setPanel(null);
-				labels[labelIndex=0];
-				self.showCatagories();
-				self.listView([]);
-				self.weatherTable([]);
-				yelpData = {};
-				googleData = [];
-				self.dataType(["All"]);
-				self.textFilter("");
-			//}
+
+			for (var i = 0; i < self.listView().length; i++) {
+				self.listView()[i].marker.setMap(null);
+			}
+
+			directionsDisplay.setMap(null);
+			directionsDisplay.setPanel(null);
+			labels[labelIndex=0];
+			self.showCatagories();
+			self.listView([]);
+			self.weatherTable([]);
+			yelpData = {};
+			googleData = [];
+			self.dataType(["All"]);
+			self.textFilter("");
+
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
@@ -263,25 +208,25 @@ var ViewModel = function(){
 
 				//get state or country for weather search
 				if(weatherPlace){
-					for(var i = 0; i < weatherPlace.length; i++){
-						if(weatherPlace[i].types[0] === "country"){
-							if(weatherPlace[i].short_name === "US"){
-								for(var j = 0; j < weatherPlace.length; j++){
-									if(weatherPlace[j].types[0] === "administrative_area_level_1"){
-										stateForWeather = weatherPlace[j].short_name;
+					for(var j = 0; j < weatherPlace.length; j++){
+						if(weatherPlace[j].types[0] === "country"){
+							if(weatherPlace[j].short_name === "US"){
+								for(var k = 0; k < weatherPlace.length; k++){
+									if(weatherPlace[k].types[0] === "administrative_area_level_1"){
+										stateForWeather = weatherPlace[k].short_name;
 									}
 								}
 							}else{
-								stateForWeather = weatherPlace[i].long_name;
+								stateForWeather = weatherPlace[j].long_name;
 							}
 						}
 					}
 
 
 					//get city for weather search
-					for(var j = 0; j < weatherPlace.length; j++){
-						if(weatherPlace[j].types[0] === "locality"){
-							cityForWeather = weatherPlace[j].long_name;
+					for(var l = 0; l < weatherPlace.length; l++){
+						if(weatherPlace[l].types[0] === "locality"){
+							cityForWeather = weatherPlace[l].long_name;
 						}
 					}
 				}
@@ -315,6 +260,8 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.showWeather = function(currentCondition, currentTemp, currentIcon, forecastCondition, forecastTime, forecastIcon, forecastTemp){
+
+		self.weatherLoad(true);
 
 		currentCondition = currentCondition;
 		currentTemp = currentTemp;
@@ -600,11 +547,11 @@ var ViewModel = function(){
 		}else{
 			self.removeDirections();
 			self.showTextFilter(false);
-			for (var i = 1; i < self.listView().length; i++) {
-				if(self.listView()[i].what !== self.currentFilter()){
-					self.listView()[i].marker.setMap(null);
+			for (var j = 1; j < self.listView().length; j++) {
+				if(self.listView()[j].what !== self.currentFilter()){
+					self.listView()[j].marker.setMap(null);
 				}else{
-					self.listView()[i].marker.setMap(map);
+					self.listView()[j].marker.setMap(map);
 				}
 			}
 		}
@@ -627,11 +574,11 @@ var ViewModel = function(){
 			self.removeDirections();
 			var filter = self.textFilter().toLowerCase();
 
-			for(var i = 1; i < self.listView().length; i++){
-				if(self.listView()[i].name.toLowerCase().indexOf(filter) > -1){
-					self.listView()[i].marker.setMap(map);
+			for(var j = 1; j < self.listView().length; j++){
+				if(self.listView()[j].name.toLowerCase().indexOf(filter) > -1){
+					self.listView()[j].marker.setMap(map);
 				}else{
-					self.listView()[i].marker.setMap(null);
+					self.listView()[j].marker.setMap(null);
 				}
 			}
 		}
@@ -697,6 +644,7 @@ var ViewModel = function(){
 	self.showOptionsAgain = function (){
 		if(fromLocalStorage === true){
 			getWeather(stateForWeather, cityForWeather);
+			fromLocalStorage = false;
 		}
 
 		map.setCenter(initialLocation);
@@ -732,7 +680,7 @@ var ViewModel = function(){
 	self.getDirections = function (where, name, marker, rating, what, url){
 		directionsDisplay.setMap(map);
 		directionsDisplay.setOptions( { suppressMarkers: true } );
-		directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+		directionsDisplay.setPanel(document.getElementById("directions-panel"));
 
 		var start = self.listView()[0].position;
 		var end = where;
