@@ -77,7 +77,7 @@ var StartPlace = function(name, position, vicinity){
 
 /**
  * The place object for the results returned from yelp or google
- * Markers from http://www.googlemapsmarkers.com/
+ * Markers from https://mapicons.mapsmarker.com/
  * @param {string} name - The name of the place
  * @param {object} position - The latitude and longitude of the place
  * @param {number} rating - The rating of the place
@@ -93,14 +93,12 @@ var Place = function(name, position, rating, what, url){
 	self.what = what;
 	self.url = url;
 	self.icon = getMarker(this.what);
-	//self.label = labels[labelIndex++ % labels.length];
 	self.marker = new google.maps.Marker({
 		map: map,
 		title: name,
 		position: self.position,
 		zoomOnClick: false,
 		icon: self.icon
-		//icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		toggleBounce();
