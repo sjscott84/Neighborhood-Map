@@ -33,7 +33,7 @@ var map,
 	infowindow,
 	yelpData,
 	googleData = [],
-	overlay = document.getElementById('googleOverlay'),
+	overlay = document.getElementById('google-overlay'),
 	labels = 'BCDEFGHIJKLMNOPQRSTUVWXYZ',
 	labelIndex = 0,
 	vicinity,
@@ -46,10 +46,6 @@ var map,
 */
 function initMap(){
 
-	var timeoutMiliSeconds = 4000;
-
-	var timer = window.setTimeout(onLoadError, timeoutMiliSeconds);
-
 	map = new google.maps.Map(document.getElementById('map'),{
 		center: startPoint,
 		zoom: 12,
@@ -57,14 +53,8 @@ function initMap(){
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
 
-	//Error if map does not load
-	function onLoadError(){
-		alert("Google is currently unavaliable, please try again later");
-	}
+	infowindow = new google.maps.InfoWindow();
 
-	infowindow = new google.maps.InfoWindow;
-
-	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
 
 	//Adds legend to different part of screen depending on screen size
@@ -84,12 +74,13 @@ function initMap(){
 		view.showResults();
 		fromLocalStorage = true;
 	}
+}
 
-	//Clear error handling setTimout once all tiles have loaded
-	google.maps.event.addListener(map, 'tilesloaded', function () {
-		window.clearTimeout(timer);
-	});
-
+/**
+ * Error if map does not load
+ */
+function onLoadError(){
+	alert("Google is currently unavaliable, please try again later");
 }
 
 /**
@@ -129,14 +120,15 @@ var Place = function(name, position, rating, what, url){
 	self.rating = rating;
 	self.what = what;
 	self.url = url;
-	self.iconColor = getMarkerColor(this.what);
-	self.label = labels[labelIndex++ % labels.length];
+	self.icon = getMarker(this.what);
+	//self.label = labels[labelIndex++ % labels.length];
 	self.marker = new google.maps.Marker({
 		map: map,
 		title: name,
 		position: self.position,
 		zoomOnClick: false,
-		icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
+		icon: self.icon
+		//icon: 'http://www.googlemapsmarkers.com/v1/'+self.label+'/'+self.iconColor
 	});
 	google.maps.event.addListener(this.marker, 'click', function() {
 		toggleBounce();
@@ -145,7 +137,7 @@ var Place = function(name, position, rating, what, url){
 		view.setPlace(self);
 	});
 
-	self.listName = self.label+" - "+name;
+	self.listName = self.name;
 
 	//Bouce the marker on click
 	function toggleBounce() {
@@ -171,6 +163,7 @@ var ViewModel = function(){
 		stateForWeather,
 		cityForWeather;
 
+	self.koSearchBox = ko.observable();
 	self.showOptions = ko.observable(true);
 	self.showForecast = ko.observable(false);
 	self.showLegend = ko.observable(false);
@@ -185,67 +178,9 @@ var ViewModel = function(){
 	self.showTextFilter = ko.observable(true);
 	self.showDropdownFilter = ko.observable(true);
 	self.weatherLoad = ko.observable(true);
-	self.catagory = ko.observable();
+	self.catagory = ko.observable("culture");
 	self.selectedPlace = ko.observable();
 	self.loading = ko.observable(false);
-
-	//this functionality turned off to meet project requirement for search capabilities
-	/**
-	 * Use W3C Geolocation to find users current position
-	 * @memberof ViewModel
-	 */
-	self.findLocation = function(){
-		var browserSupportFlag =  new Boolean();
-		var initialLocation;
-		var geocoder = new google.maps.Geocoder;
-
-		directionsDisplay = new google.maps.DirectionsRenderer();
-		directionsService = new google.maps.DirectionsService();
-
-		// Try W3C Geolocation (Preferred)
-		if(navigator.geolocation) {
-			browserSupportFlag = true;
-			navigator.geolocation.getCurrentPosition(function(position) {
-				cll = position.coords.latitude+','+position.coords.longitude;
-				initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-				map.setCenter(initialLocation);
-				geocodeLatLng(initialLocation);
-				self.addStartPlace("Starting Point", initialLocation, vicinity);
-			}, function() {
-				handleNoGeolocation(browserSupportFlag);
-			});
-		}
-		// If browser doesn't support Geolocation
-		else {
-			browserSupportFlag = false;
-			handleNoGeolocation(browserSupportFlag);
-		}
-		// Handle erros
-		function handleNoGeolocation(errorFlag) {
-			if (errorFlag === true) {
-				alert("Geolocation service failed, enter your starting location in the search field in the map");
-				map.setCenter(startPoint);
-			} else {
-				alert("Geolocation service failed, enter your starting location in the search field in the map");
-				map.setCenter(startPoint);
-			}
-		}
-
-		function geocodeLatLng(where){
-			var latlng = where;
-			geocoder.geocode({'location': latlng}, function(results, status){
-				if (status === google.maps.GeocoderStatus.OK) {
-					if (results[1]) {
-						vicinity = results[1].formatted_address;
-					} else {
-					window.alert('No results found');
-					}
-				} else {
-					window.alert('Geocoder failed due to: ' + status);
-				}
-			});
-		}
-	};
 
 	/**
 	 * Search box, used to find starting point for place searches if unable to use geolocation
@@ -271,24 +206,26 @@ var ViewModel = function(){
 		// retrieves more details for that place.
 		searchBox.addListener('places_changed', function() {
 			places = searchBox.getPlaces();
+
 			if (places.length === 0) {
 				return;
 			}
-			//if (self.listView().length > 0){
-				for (var i = 0; i &lt; self.listView().length; i++) {
-					self.listView()[i].marker.setMap(null);
-				}
-				directionsDisplay.setMap(null);
-				directionsDisplay.setPanel(null);
-				labels[labelIndex=0];
-				self.showCatagories();
-				self.listView([]);
-				self.weatherTable([]);
-				yelpData = {};
-				googleData = [];
-				self.dataType(["All"]);
-				self.textFilter("");
-			//}
+
+			for (var i = 0; i &lt; self.listView().length; i++) {
+				self.listView()[i].marker.setMap(null);
+			}
+
+			directionsDisplay.setMap(null);
+			directionsDisplay.setPanel(null);
+			labels[labelIndex=0];
+			self.showCatagories();
+			self.listView([]);
+			self.weatherTable([]);
+			yelpData = {};
+			googleData = [];
+			self.dataType(["All"]);
+			self.textFilter("");
+
 			places.forEach(function(place) {
 				var name = place.name;
 				var position = place.geometry.location;
@@ -299,25 +236,25 @@ var ViewModel = function(){
 
 				//get state or country for weather search
 				if(weatherPlace){
-					for(var i = 0; i &lt; weatherPlace.length; i++){
-						if(weatherPlace[i].types[0] === "country"){
-							if(weatherPlace[i].short_name === "US"){
-								for(var j = 0; j &lt; weatherPlace.length; j++){
-									if(weatherPlace[j].types[0] === "administrative_area_level_1"){
-										stateForWeather = weatherPlace[j].short_name;
+					for(var j = 0; j &lt; weatherPlace.length; j++){
+						if(weatherPlace[j].types[0] === "country"){
+							if(weatherPlace[j].short_name === "US"){
+								for(var k = 0; k &lt; weatherPlace.length; k++){
+									if(weatherPlace[k].types[0] === "administrative_area_level_1"){
+										stateForWeather = weatherPlace[k].short_name;
 									}
 								}
 							}else{
-								stateForWeather = weatherPlace[i].long_name;
+								stateForWeather = weatherPlace[j].long_name;
 							}
 						}
 					}
 
 
 					//get city for weather search
-					for(var j = 0; j &lt; weatherPlace.length; j++){
-						if(weatherPlace[j].types[0] === "locality"){
-							cityForWeather = weatherPlace[j].long_name;
+					for(var l = 0; l &lt; weatherPlace.length; l++){
+						if(weatherPlace[l].types[0] === "locality"){
+							cityForWeather = weatherPlace[l].long_name;
 						}
 					}
 				}
@@ -352,24 +289,26 @@ var ViewModel = function(){
 	 */
 	self.showWeather = function(currentCondition, currentTemp, currentIcon, forecastCondition, forecastTime, forecastIcon, forecastTemp){
 
-		var currentCondition = currentCondition;
-		var currentTemp = currentTemp;
-		var currentIcon = currentIcon;
-		var forecastCondition = forecastCondition;
-		var forecastTime = forecastTime;
-		var forecastIcon = forecastIcon;
-		var forecastTemp = forecastTemp;
+		self.weatherLoad(true);
+
+		currentCondition = currentCondition;
+		currentTemp = currentTemp;
+		currentIcon = currentIcon;
+		forecastCondition = forecastCondition;
+		forecastTime = forecastTime;
+		forecastIcon = forecastIcon;
+		forecastTemp = forecastTemp;
 
 		self.showForecast(true);
 
-		self.weatherTable.push({time: "Now", url: currentIcon, condition: currentCondition+" - "+currentTemp+"F"})
+		self.weatherTable.push({time: "Now", url: currentIcon, condition: currentCondition+" - "+currentTemp+"F"});
 
 		for(var i = 0; i &lt; forecastTime.length; i++){
-			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"})
+			self.weatherTable.push({time: forecastTime[i], url: forecastIcon[i], condition: forecastCondition[i]+" - "+forecastTemp[i]+"F"});
 		}
 
 		self.weatherLoad(false);
-	}
+	};
 
 	/**
 	 * Defines types for the findThings function to search weather results come from yelp api or google places api
@@ -537,7 +476,7 @@ var ViewModel = function(){
 		}
 
 		self.setDataTypeArray(self.listView());
-		self.fitBoundsToVisibleMarkers()
+		self.fitBoundsToVisibleMarkers();
 		self.loading(false);
 
 	};
@@ -560,7 +499,7 @@ var ViewModel = function(){
 
 			map.fitBounds(bounds);
 		}
-	}
+	};
 
 	/**
 	 * If marker was changed to a red B on click this function changes it back to its original form
@@ -570,11 +509,11 @@ var ViewModel = function(){
 		if(map){
 			for (var i = 0; i&lt;view.listView().length; i++){
 				if(view.listView()[i].marker.icon === 'http://www.googlemapsmarkers.com/v1/B/FF0000'){
-					view.listView()[i].marker.setIcon('http://www.googlemapsmarkers.com/v1/'+view.listView()[i].label+'/'+view.listView()[i].iconColor);
+					view.listView()[i].marker.setIcon(view.listView()[i].icon);
 				}
 			}
 		}
-	}
+	};
 
 	/**
 	 * Remove any directions from screen before change position of markers
@@ -617,7 +556,7 @@ var ViewModel = function(){
 				var result = rec.listName.toLowerCase();
 				if(result.indexOf(filter) > -1){
 					return result;
-				};
+				}
 			});
 		}
 	});
@@ -636,11 +575,11 @@ var ViewModel = function(){
 		}else{
 			self.removeDirections();
 			self.showTextFilter(false);
-			for (var i = 1; i &lt; self.listView().length; i++) {
-				if(self.listView()[i].what !== self.currentFilter()){
-					self.listView()[i].marker.setMap(null);
+			for (var j = 1; j &lt; self.listView().length; j++) {
+				if(self.listView()[j].what !== self.currentFilter()){
+					self.listView()[j].marker.setMap(null);
 				}else{
-					self.listView()[i].marker.setMap(map);
+					self.listView()[j].marker.setMap(map);
 				}
 			}
 		}
@@ -663,11 +602,11 @@ var ViewModel = function(){
 			self.removeDirections();
 			var filter = self.textFilter().toLowerCase();
 
-			for(var i = 1; i &lt; self.listView().length; i++){
-				if(self.listView()[i].name.toLowerCase().indexOf(filter) > -1){
-					self.listView()[i].marker.setMap(map);
+			for(var j = 1; j &lt; self.listView().length; j++){
+				if(self.listView()[j].name.toLowerCase().indexOf(filter) > -1){
+					self.listView()[j].marker.setMap(map);
 				}else{
-					self.listView()[i].marker.setMap(null);
+					self.listView()[j].marker.setMap(null);
 				}
 			}
 		}
@@ -681,7 +620,7 @@ var ViewModel = function(){
 	 */
 	self.filter = function (genre) {
 		self.currentFilter(genre);
-		self.fitBoundsToVisibleMarkers()
+		self.fitBoundsToVisibleMarkers();
 	};
 
 	/**
@@ -733,6 +672,7 @@ var ViewModel = function(){
 	self.showOptionsAgain = function (){
 		if(fromLocalStorage === true){
 			getWeather(stateForWeather, cityForWeather);
+			fromLocalStorage = false;
 		}
 
 		map.setCenter(initialLocation);
@@ -768,7 +708,7 @@ var ViewModel = function(){
 	self.getDirections = function (where, name, marker, rating, what, url){
 		directionsDisplay.setMap(map);
 		directionsDisplay.setOptions( { suppressMarkers: true } );
-		directionsDisplay.setPanel(document.getElementById("directionsPanel"));
+		directionsDisplay.setPanel(document.getElementById("directions-panel"));
 
 		var start = self.listView()[0].position;
 		var end = where;
@@ -855,7 +795,7 @@ var ViewModel = function(){
 		var initLocation = localStorage.getItem("initialLocation");
 		initialLocation = JSON.parse(initLocation);
 		stateForWeather = localStorage.getItem("stateWeather");
-		cityForWeather = localStorage.getItem("cityWeather")
+		cityForWeather = localStorage.getItem("cityWeather");
 		labels[labelIndex=0];
 
 		self.addStartPlace(resultsToUse[0].name, resultsToUse[0].position, resultsToUse[0].vicinity);
@@ -885,19 +825,20 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.changePositionOfLegend = function (){
-		var left = google.maps.ControlPosition.LEFT_TOP;
-		var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
+		if(map){
+			var left = google.maps.ControlPosition.LEFT_TOP;
+			var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
 
-		if( $(window).width() &lt; 600 &amp;&amp; map.controls[left].length === 1){
-			map.controls[left].clear();
-			map.controls[bottom].push(overlay);
-			map.setCenter(initialLocation);
-		}else if( $(window).width() > 600 &amp;&amp; map.controls[bottom].length === 1){
-			map.controls[bottom].clear();
-			map.controls[left].push(overlay);
-			map.setCenter(initialLocation);
+			if( $(window).width() &lt; 600 &amp;&amp; map.controls[left].length === 1){
+				map.controls[left].clear();
+				map.controls[bottom].push(overlay);
+				map.setCenter(initialLocation);
+			}else if( $(window).width() > 600 &amp;&amp; map.controls[bottom].length === 1){
+				map.controls[bottom].clear();
+				map.controls[left].push(overlay);
+				map.setCenter(initialLocation);
+			}
 		}
-
 	};
 
 };
@@ -916,13 +857,13 @@ ko.applyBindings(view);</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="ViewModel.html">ViewModel</a></li></ul><h3>Global</h3><ul><li><a href="global.html#initMap">initMap</a></li><li><a href="global.html#Place">Place</a></li><li><a href="global.html#StartPlace">StartPlace</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="ViewModel.html">ViewModel</a></li></ul><h3>Global</h3><ul><li><a href="global.html#initMap">initMap</a></li><li><a href="global.html#onLoadError">onLoadError</a></li><li><a href="global.html#Place">Place</a></li><li><a href="global.html#StartPlace">StartPlace</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat Feb 27 2016 08:52:56 GMT-0800 (PST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Mar 01 2016 12:49:57 GMT-0800 (PST)
 </footer>
 
 <script> prettyPrint(); </script>

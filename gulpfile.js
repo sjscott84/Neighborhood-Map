@@ -23,7 +23,7 @@ gulp.task('uglify', function(){
 })
 
 gulp.task('images', function(){
-	return gulp.src('app/images/*.jpg')
+	return gulp.src('app/images/*')
 		.pipe(imagemin())
 		.pipe(gulp.dest('dist/images'));
 })
