@@ -66,7 +66,19 @@ html, body {
 	font-family: Roboto;
 }
 
-#radioOptions {
+#culture {
+	display: block;
+}
+
+#amusement {
+	display: block;
+}
+
+#outdoors {
+	display: block;
+}
+
+#animals {
 	display: block;
 }
 
@@ -104,7 +116,12 @@ html, body {
 	overflow-y: scroll;
 }
 
-#loading {
+#loadingWeather {
+	margin-left: 40%;
+	margin-top: 10px;
+}
+
+#loadingInfo {
 	margin-left: 40%;
 	margin-top: 10px;
 }
@@ -165,7 +182,25 @@ html, body {
 		padding-top: 80px;
 	}
 
-	#radioOptions {
+	#culture {
+		display: inline-block;
+		padding-right: 5px;
+		padding-bottom: 5px;
+	}
+
+	#amusement {
+		display: inline-block;
+		padding-right: 5px;
+		padding-bottom: 5px;
+	}
+
+	#outdoors {
+		display: inline-block;
+		padding-right: 5px;
+		padding-bottom: 5px;
+	}
+
+	#animals {
 		display: inline-block;
 		padding-right: 5px;
 		padding-bottom: 5px;

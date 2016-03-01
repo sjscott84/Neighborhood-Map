@@ -18,10 +18,6 @@ var map,
 */
 function initMap(){
 
-	var timeoutMiliSeconds = 4000;
-
-	var timer = window.setTimeout(onLoadError, timeoutMiliSeconds);
-
 	map = new google.maps.Map(document.getElementById('map'),{
 		center: startPoint,
 		zoom: 12,
@@ -29,12 +25,7 @@ function initMap(){
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
 
-	//Error if map does not load
-	function onLoadError(){
-		alert("Google is currently unavaliable, please try again later");
-	}
-
-	infowindow = new google.maps.InfoWindow;
+	infowindow = new google.maps.InfoWindow();
 
 	//view.findLocation();//this functionality turned off to meet project requirement for search capabilities
 	view.addSearch();
@@ -56,12 +47,11 @@ function initMap(){
 		view.showResults();
 		fromLocalStorage = true;
 	}
+}
 
-	//Clear error handling setTimout once all tiles have loaded
-	google.maps.event.addListener(map, 'tilesloaded', function () {
-		window.clearTimeout(timer);
-	});
-
+//Error if map does not load
+function onLoadError(){
+	alert("Google is currently unavaliable, please try again later");
 }
 
 /**
@@ -144,6 +134,7 @@ var ViewModel = function(){
 		stateForWeather,
 		cityForWeather;
 
+	self.koSearchBox = ko.observable();
 	self.showOptions = ko.observable(true);
 	self.showForecast = ko.observable(false);
 	self.showLegend = ko.observable(false);
@@ -158,7 +149,7 @@ var ViewModel = function(){
 	self.showTextFilter = ko.observable(true);
 	self.showDropdownFilter = ko.observable(true);
 	self.weatherLoad = ko.observable(true);
-	self.catagory = ko.observable();
+	self.catagory = ko.observable("culture");
 	self.selectedPlace = ko.observable();
 	self.loading = ko.observable(false);
 
@@ -170,7 +161,7 @@ var ViewModel = function(){
 	self.findLocation = function(){
 		var browserSupportFlag =  new Boolean();
 		var initialLocation;
-		var geocoder = new google.maps.Geocoder;
+		var geocoder = new google.maps.Geocoder();
 
 		directionsDisplay = new google.maps.DirectionsRenderer();
 		directionsService = new google.maps.DirectionsService();
@@ -325,13 +316,13 @@ var ViewModel = function(){
 	 */
 	self.showWeather = function(currentCondition, currentTemp, currentIcon, forecastCondition, forecastTime, forecastIcon, forecastTemp){
 
-		var currentCondition = currentCondition;
-		var currentTemp = currentTemp;
-		var currentIcon = currentIcon;
-		var forecastCondition = forecastCondition;
-		var forecastTime = forecastTime;
-		var forecastIcon = forecastIcon;
-		var forecastTemp = forecastTemp;
+		currentCondition = currentCondition;
+		currentTemp = currentTemp;
+		currentIcon = currentIcon;
+		forecastCondition = forecastCondition;
+		forecastTime = forecastTime;
+		forecastIcon = forecastIcon;
+		forecastTemp = forecastTemp;
 
 		self.showForecast(true);
 
@@ -858,19 +849,20 @@ var ViewModel = function(){
 	 * @memberof ViewModel
 	 */
 	self.changePositionOfLegend = function (){
-		var left = google.maps.ControlPosition.LEFT_TOP;
-		var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
+		if(map){
+			var left = google.maps.ControlPosition.LEFT_TOP;
+			var bottom = google.maps.ControlPosition.BOTTOM_CENTER;
 
-		if( $(window).width() < 600 && map.controls[left].length === 1){
-			map.controls[left].clear();
-			map.controls[bottom].push(overlay);
-			map.setCenter(initialLocation);
-		}else if( $(window).width() > 600 && map.controls[bottom].length === 1){
-			map.controls[bottom].clear();
-			map.controls[left].push(overlay);
-			map.setCenter(initialLocation);
+			if( $(window).width() < 600 && map.controls[left].length === 1){
+				map.controls[left].clear();
+				map.controls[bottom].push(overlay);
+				map.setCenter(initialLocation);
+			}else if( $(window).width() > 600 && map.controls[bottom].length === 1){
+				map.controls[bottom].clear();
+				map.controls[left].push(overlay);
+				map.setCenter(initialLocation);
+			}
 		}
-
 	};
 
 };
