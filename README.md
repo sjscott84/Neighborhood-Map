@@ -19,7 +19,7 @@ This can be used for anywhere in the world, however, it works best in major citi
 
 ## Install
 
-No installation needed simply go to http://sjscott84.github.io/Neighborhood-Map/dist
+No installation needed simply go to http://sjscott84.github.io/frontend-nanodegree-neighborhood-map/dist/
 
 ## To Run Application Locally
 
